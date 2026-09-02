@@ -2,7 +2,7 @@
    Prevents: Failed to execute 'define' ... name 'week-planner-card-plus' has already been used
    This can happen if the same JS is loaded twice (different URL, cache-busted params, or both YAML+UI resources).
 */
-console.info("[week-planner-card-plus] loaded patched build 2026-08-29 (soonTime + startHour/endHour)");
+console.info("[week-planner-card-plus] loaded patched build 2026-09-02 (timeline autoScroll + now line)");
 (()=>{try{
   const ce = globalThis.customElements;
   if(!ce||!ce.define||!ce.get) return;
@@ -706,7 +706,7 @@ window.__wpc_i18n_apply = (card) => {
 };
 /* ===== end i18n helper ===== */
 
-customElements.define("week-planner-card-plus",class extends es{static styles=i8;_initialized=!1;_loading=0;_events={};_calendarEvents={};_calendars;_numberOfDays;_numberOfDaysIsMonth;_updateInterval;_noCardBackground;_eventBackground;_compact;_language;_weather;_dateFormat;_timeFormat;_locationLink;_startDate;_hideWeekend;_startingDay;_startingDayOffset;_weatherForecast=null;_showLocation;_hidePastEvents;_hideDaysWithoutEvents;_hideTodayWithoutEvents;_filter;_filterText;_replaceTitleText;_combineSimilarEvents;_soonTime;_startHour;_endHour;_showLegend;_legendToggle;_actions;_columns;_loader;_showNavigation;_navigationOffset=0;_updateEventsTimeouts=[];static getConfigElement(){return document.createElement("week-planner-card-plus-editor")}static getStubConfig(){return{calendars:[],days:7,startingDay:"today",startingDayOffset:0,showWeekDayText:!0,hideWeekend:!1,noCardBackground:!1,compact:!1,weather:{showCondition:!0,showTemperature:!1,showLowTemperature:!1,roundTemperature:!1,useTwiceDaily:!1},locale:"en",showLocation:!1,hidePastEvents:!1,hideDaysWithoutEvents:!1,hideTodayWithoutEvents:!1,combineSimilarEvents:!1,soonTime:"00:00",startHour:0,endHour:24,showLegend:!1,tapEmptyDayToAdd:!1,clickEmptyDayToAddPlus:!1,defaultAllDay:!1}}static get properties(){return{_days:{type:Array},_config:{type:Object},_error:{type:String},_currentEventDetails:{type:Object},_hideCalendars:{type:Array},_rnrEditOpen:{type:Boolean},_rnrEditDraft:{type:Object}}}setConfig(e){if(this._config=e,!e.calendars)throw Error("No calendars are configured");this._numberOfDaysIsMonth=this._isNumberOfDaysMonth(e.days??7),this._title=e.title??null,this._calendars=e.calendars,this._weather=this._getWeatherConfig(e.weather),this._numberOfDays=this._getNumberOfDays(e.days??7),this._hideWeekend=e.hideWeekend??!1,this._showNavigation=e.showNavigation??!1,this._startingDay=e.startingDay??"today",this._startingDayOffset=e.startingDayOffset??0,this._showWeekDayText=e.showWeekDayText??!0,this._startDate=this._getStartDate(),this._updateInterval=e.updateInterval??60,this._noCardBackground=e.noCardBackground??!1,this._eventBackground=e.eventBackground??"var(--card-background-color, inherit)",this._compact=e.compact??!1,this._dayFormat=e.dayFormat??null,this._dateFormat=e.dateFormat??"cccc d LLLL yyyy",this._timeFormat=e.timeFormat??"HH:mm",this._locationLink=e.locationLink??"https://www.google.com/maps/search/?api=1&query=",this._showTitle=e.showTitle??!0,this._showDescription=e.showDescription??!1,this._showLocation=e.showLocation??!1,this._hidePastEvents=e.hidePastEvents??!1,this._hideDaysWithoutEvents=e.hideDaysWithoutEvents??!1,this._hideTodayWithoutEvents=e.hideTodayWithoutEvents??!1,this._filter=e.filter??!1,this._filterText=e.filterText??!1,this._replaceTitleText=e.replaceTitleText??!1,this._combineSimilarEvents=e.combineSimilarEvents??!1,this._soonTime="string"==typeof e.soonTime&&/^(?:[01]?\d|2[0-3]):[0-5]\d$/.test(e.soonTime)?e.soonTime.padStart(5,"0"):"00:00",this._startHour=(()=>{const v=e.startHour??e.timelineStartHour;if(v==null||v==="")return 0;if("string"==typeof v&&"auto"===v.toLowerCase().trim())return"auto";const n=Number(v);return Number.isFinite(n)?Math.max(0,Math.min(23,Math.floor(n))):0})(),this._endHour=(()=>{const v=e.endHour??e.timelineEndHour;if(v==null||v==="")return 24;if("string"==typeof v&&"auto"===v.toLowerCase().trim())return"auto";const n=Number(v);return Number.isFinite(n)?Math.max(1,Math.min(24,Math.floor(n))):24})(),this._showLegend=e.showLegend??!1,this._legendToggle=e.legendToggle??!1,this._actions=e.actions??!1,this._columns=e.columns??{},this._maxEvents=e.maxEvents??!1,this._maxDayEvents=e.maxDayEvents??!1,this._hideCalendars=(e.calendars||[]).reduce((e,t)=>(t.initiallyHidden&&t.entity&&e.push(t.entity),e),[]),e.locale&&(eh.Settings.defaultLocale=e.locale),this._language=Object.assign({},{fullDay:"Entire day",noEvents:"No events",moreEvents:"More events",today:"Today",tomorrow:"Tomorrow",yesterday:"Yesterday",sunday:eh.Info.weekdays("long")[6],monday:eh.Info.weekdays("long")[0],tuesday:eh.Info.weekdays("long")[1],wednesday:eh.Info.weekdays("long")[2],thursday:eh.Info.weekdays("long")[3],friday:eh.Info.weekdays("long")[4],saturday:eh.Info.weekdays("long")[5]},e.texts??{}),this._calendarErrors=[],this._rnrTapEmptyDayToAdd=e.tapEmptyDayToAdd??!1,this._rnrClickEmptyDayToAddPlus=e.clickEmptyDayToAddPlus??!1,this._rnrDefaultAllDay=e.defaultAllDay??!1,this.__rnrCfgLogged||(console.info('[week-planner-card-plus] cfg tapEmptyDayToAdd=',this._rnrTapEmptyDayToAdd,' clickEmptyDayToAddPlus=',this._rnrClickEmptyDayToAddPlus),this.__rnrCfgLogged=!0),this._rnrAddEventPopupHash=e.addEventPopupHash??"#addcalendarevent",this._rnrAddEventHelpers=e.addEventHelpers??null,this._daysFromConfig=e.days,this._responsive=e.responsive??!1,this._minDayWidth=e.minDayWidth??120,this._maxDays=e.maxDays??7,this._applyResponsiveDays&&queueMicrotask?queueMicrotask(()=>this._applyResponsiveDays()):setTimeout(()=>{this._applyResponsiveDays&&this._applyResponsiveDays()},0)}connectedCallback(){super.connectedCallback&&super.connectedCallback();this._setupResponsive&&this._setupResponsive();}disconnectedCallback(){this._teardownResponsive&&this._teardownResponsive();super.disconnectedCallback&&super.disconnectedCallback();}_setupResponsive(){if(!this._responsive)return;if(this._resizeObs)return;try{this._resizeObs=new ResizeObserver(()=>{this._applyResponsiveDays&&this._applyResponsiveDays()});this._resizeObs.observe(this)}catch(e){this._winResizeHandler=()=>{this._applyResponsiveDays&&this._applyResponsiveDays()};window.addEventListener('resize',this._winResizeHandler)}}_teardownResponsive(){if(this._resizeObs){try{this._resizeObs.disconnect()}catch(e){}this._resizeObs=null}if(this._winResizeHandler){window.removeEventListener('resize',this._winResizeHandler);this._winResizeHandler=null}}_applyResponsiveDays(){if(!this._responsive)return;if(this._daysFromConfig&&this._isNumberOfDaysMonth(this._daysFromConfig))return;let e=0;try{e=this.getBoundingClientRect().width}catch(t){}e=e||this.offsetWidth||window.innerWidth||0;if(!e)return;let t=Number(this._minDayWidth)||120,n=Number(this._maxDays)||7;let r=Math.floor(e/t);r<1&&(r=1),r>n&&(r=n);this._numberOfDays!==r&&(this._numberOfDays=r,this.requestUpdate&&this.requestUpdate())}_isNumberOfDaysMonth(e){return"month"===String(e).toLowerCase().trim()}_getWeatherConfig(e){if(!e||"string"!=typeof e&&"object"!=typeof e)return null;let t={entity:null,showCondition:!0,showTemperature:!1,showLowTemperature:!1,roundTemperature:!1};return("string"==typeof e?t.entity=e:Object.assign(t,e),t.hasOwnProperty("entity")&&null!==t.entity)?t:null}render(){this._loader||(this._loader=this._getLoader()),this._initialized||(this._initialized=!0,this._waitForHassAndConfig());let e=[];this._noCardBackground&&e.push("nobackground"),this._compact&&e.push("compact");let t=["--event-background-color: "+this._eventBackground+";"];return this._columns.extraLarge&&t.push("--days-columns: "+this._columns.extraLarge+";"),this._columns.large&&t.push("--days-columns-lg: "+this._columns.large+";"),this._columns.medium&&t.push("--days-columns-md: "+this._columns.medium+";"),this._columns.small&&t.push("--days-columns-sm: "+this._columns.small+";"),this._columns.extraSmall&&t.push("--days-columns-xs: "+this._columns.extraSmall+";"),W`
+customElements.define("week-planner-card-plus",class extends es{static styles=i8;_initialized=!1;_loading=0;_events={};_calendarEvents={};_calendars;_numberOfDays;_numberOfDaysIsMonth;_updateInterval;_noCardBackground;_eventBackground;_compact;_language;_weather;_dateFormat;_timeFormat;_locationLink;_startDate;_hideWeekend;_startingDay;_startingDayOffset;_weatherForecast=null;_showLocation;_hidePastEvents;_hideDaysWithoutEvents;_hideTodayWithoutEvents;_filter;_filterText;_replaceTitleText;_combineSimilarEvents;_soonTime;_startHour;_endHour;_autoScroll;_dimPastEvents;_showCurrentTimeBoundary;_showLegend;_legendToggle;_actions;_columns;_loader;_showNavigation;_navigationOffset=0;_updateEventsTimeouts=[];static getConfigElement(){return document.createElement("week-planner-card-plus-editor")}static getStubConfig(){return{calendars:[],days:7,startingDay:"today",startingDayOffset:0,showWeekDayText:!0,hideWeekend:!1,noCardBackground:!1,compact:!1,weather:{showCondition:!0,showTemperature:!1,showLowTemperature:!1,roundTemperature:!1,useTwiceDaily:!1},locale:"en",showLocation:!1,hidePastEvents:!1,hideDaysWithoutEvents:!1,hideTodayWithoutEvents:!1,combineSimilarEvents:!1,soonTime:"00:00",startHour:0,endHour:24,autoScroll:!1,dimPastEvents:!1,showCurrentTimeBoundary:!1,showLegend:!1,tapEmptyDayToAdd:!1,clickEmptyDayToAddPlus:!1,defaultAllDay:!1}}static get properties(){return{_days:{type:Array},_config:{type:Object},_error:{type:String},_currentEventDetails:{type:Object},_hideCalendars:{type:Array},_rnrEditOpen:{type:Boolean},_rnrEditDraft:{type:Object}}}setConfig(e){if(this._config=e,!e.calendars)throw Error("No calendars are configured");this._numberOfDaysIsMonth=this._isNumberOfDaysMonth(e.days??7),this._title=e.title??null,this._calendars=e.calendars,this._weather=this._getWeatherConfig(e.weather),this._numberOfDays=this._getNumberOfDays(e.days??7),this._hideWeekend=e.hideWeekend??!1,this._showNavigation=e.showNavigation??!1,this._startingDay=e.startingDay??"today",this._startingDayOffset=e.startingDayOffset??0,this._showWeekDayText=e.showWeekDayText??!0,this._startDate=this._getStartDate(),this._updateInterval=e.updateInterval??60,this._noCardBackground=e.noCardBackground??!1,this._eventBackground=e.eventBackground??"var(--card-background-color, inherit)",this._compact=e.compact??!1,this._dayFormat=e.dayFormat??null,this._dateFormat=e.dateFormat??"cccc d LLLL yyyy",this._timeFormat=e.timeFormat??"HH:mm",this._locationLink=e.locationLink??"https://www.google.com/maps/search/?api=1&query=",this._showTitle=e.showTitle??!0,this._showDescription=e.showDescription??!1,this._showLocation=e.showLocation??!1,this._hidePastEvents=e.hidePastEvents??!1,this._hideDaysWithoutEvents=e.hideDaysWithoutEvents??!1,this._hideTodayWithoutEvents=e.hideTodayWithoutEvents??!1,this._filter=e.filter??!1,this._filterText=e.filterText??!1,this._replaceTitleText=e.replaceTitleText??!1,this._combineSimilarEvents=e.combineSimilarEvents??!1,this._soonTime="string"==typeof e.soonTime&&/^(?:[01]?\d|2[0-3]):[0-5]\d$/.test(e.soonTime)?e.soonTime.padStart(5,"0"):"00:00",this._startHour=(()=>{const v=e.startHour??e.timelineStartHour;if(v==null||v==="")return 0;if("string"==typeof v&&"auto"===v.toLowerCase().trim())return"auto";const n=Number(v);return Number.isFinite(n)?Math.max(0,Math.min(23,Math.floor(n))):0})(),this._endHour=(()=>{const v=e.endHour??e.timelineEndHour;if(v==null||v==="")return 24;if("string"==typeof v&&"auto"===v.toLowerCase().trim())return"auto";const n=Number(v);return Number.isFinite(n)?Math.max(1,Math.min(24,Math.floor(n))):24})(),this._autoScroll=!!e.autoScroll,this._dimPastEvents=!!e.dimPastEvents,this._showCurrentTimeBoundary=!!(e.showCurrentTimeBoundary??e.showNowLine),this._rnrTimelineAutoScrolled=!1,this._showLegend=e.showLegend??!1,this._legendToggle=e.legendToggle??!1,this._actions=e.actions??!1,this._columns=e.columns??{},this._maxEvents=e.maxEvents??!1,this._maxDayEvents=e.maxDayEvents??!1,this._hideCalendars=(e.calendars||[]).reduce((e,t)=>(t.initiallyHidden&&t.entity&&e.push(t.entity),e),[]),e.locale&&(eh.Settings.defaultLocale=e.locale),this._language=Object.assign({},{fullDay:"Entire day",noEvents:"No events",moreEvents:"More events",today:"Today",tomorrow:"Tomorrow",yesterday:"Yesterday",sunday:eh.Info.weekdays("long")[6],monday:eh.Info.weekdays("long")[0],tuesday:eh.Info.weekdays("long")[1],wednesday:eh.Info.weekdays("long")[2],thursday:eh.Info.weekdays("long")[3],friday:eh.Info.weekdays("long")[4],saturday:eh.Info.weekdays("long")[5]},e.texts??{}),this._calendarErrors=[],this._rnrTapEmptyDayToAdd=e.tapEmptyDayToAdd??!1,this._rnrClickEmptyDayToAddPlus=e.clickEmptyDayToAddPlus??!1,this._rnrDefaultAllDay=e.defaultAllDay??!1,this.__rnrCfgLogged||(console.info('[week-planner-card-plus] cfg tapEmptyDayToAdd=',this._rnrTapEmptyDayToAdd,' clickEmptyDayToAddPlus=',this._rnrClickEmptyDayToAddPlus),this.__rnrCfgLogged=!0),this._rnrAddEventPopupHash=e.addEventPopupHash??"#addcalendarevent",this._rnrAddEventHelpers=e.addEventHelpers??null,this._daysFromConfig=e.days,this._responsive=e.responsive??!1,this._minDayWidth=e.minDayWidth??120,this._maxDays=e.maxDays??7,this._applyResponsiveDays&&queueMicrotask?queueMicrotask(()=>this._applyResponsiveDays()):setTimeout(()=>{this._applyResponsiveDays&&this._applyResponsiveDays()},0)}connectedCallback(){super.connectedCallback&&super.connectedCallback();this._setupResponsive&&this._setupResponsive();}disconnectedCallback(){this._teardownResponsive&&this._teardownResponsive();super.disconnectedCallback&&super.disconnectedCallback();}_setupResponsive(){if(!this._responsive)return;if(this._resizeObs)return;try{this._resizeObs=new ResizeObserver(()=>{this._applyResponsiveDays&&this._applyResponsiveDays()});this._resizeObs.observe(this)}catch(e){this._winResizeHandler=()=>{this._applyResponsiveDays&&this._applyResponsiveDays()};window.addEventListener('resize',this._winResizeHandler)}}_teardownResponsive(){if(this._resizeObs){try{this._resizeObs.disconnect()}catch(e){}this._resizeObs=null}if(this._winResizeHandler){window.removeEventListener('resize',this._winResizeHandler);this._winResizeHandler=null}}_applyResponsiveDays(){if(!this._responsive)return;if(this._daysFromConfig&&this._isNumberOfDaysMonth(this._daysFromConfig))return;let e=0;try{e=this.getBoundingClientRect().width}catch(t){}e=e||this.offsetWidth||window.innerWidth||0;if(!e)return;let t=Number(this._minDayWidth)||120,n=Number(this._maxDays)||7;let r=Math.floor(e/t);r<1&&(r=1),r>n&&(r=n);this._numberOfDays!==r&&(this._numberOfDays=r,this.requestUpdate&&this.requestUpdate())}_isNumberOfDaysMonth(e){return"month"===String(e).toLowerCase().trim()}_getWeatherConfig(e){if(!e||"string"!=typeof e&&"object"!=typeof e)return null;let t={entity:null,showCondition:!0,showTemperature:!1,showLowTemperature:!1,roundTemperature:!1};return("string"==typeof e?t.entity=e:Object.assign(t,e),t.hasOwnProperty("entity")&&null!==t.entity)?t:null}render(){this._loader||(this._loader=this._getLoader()),this._initialized||(this._initialized=!0,this._waitForHassAndConfig());let e=[];this._noCardBackground&&e.push("nobackground"),this._compact&&e.push("compact");let t=["--event-background-color: "+this._eventBackground+";"];return this._columns.extraLarge&&t.push("--days-columns: "+this._columns.extraLarge+";"),this._columns.large&&t.push("--days-columns-lg: "+this._columns.large+";"),this._columns.medium&&t.push("--days-columns-md: "+this._columns.medium+";"),this._columns.small&&t.push("--days-columns-sm: "+this._columns.small+";"),this._columns.extraSmall&&t.push("--days-columns-xs: "+this._columns.extraSmall+";"),W`
             <ha-card class="${e.join(" ")}" style="${t.join(" ")}">
                 <div class="card-content">
                     ${this._error?W`<div class="errors"><ha-alert alert-type="error">${this._error}</ha-alert></div>`:""}
@@ -2143,6 +2143,9 @@ _closeDialog(){this._currentEventDetails=null,this._rnrEditOpen=!1,this._rnrEdit
                         ${this.addTextField("soonTime","Soon window (HH:MM)","text","00:00")}
                         ${this.addTextField("startHour","Timeline start hour (0-23 or auto)","text","0")}
                         ${this.addTextField("endHour","Timeline end hour (1-24 or auto)","text","24")}
+                        ${this.addBooleanField("autoScroll","Timeline: auto-scroll to current time on load")}
+                        ${this.addBooleanField("dimPastEvents","Timeline: dim today's past events")}
+                        ${this.addBooleanField("showCurrentTimeBoundary","Timeline: show current-time line (today)")}
                         ${this.addBooleanField("showTitle","Show title in overview",!0)}
                         ${this.addBooleanField("showDescription","Show description in overview")}
                         ${this.addBooleanField("showLocation","Show location in overview")}
@@ -2343,6 +2346,31 @@ _closeDialog(){this._currentEventDetails=null,this._rnrEditOpen=!1,this._rnrEdit
     return out;
   };
 
+  Card.prototype._rnrIsPastEventToday=function(ev,dayDate){
+    if(!this._dimPastEvents||!dayDate||!this._isToday(dayDate))return!1;
+    try{
+      const now=eh.DateTime.now();
+      return!ev.fullDay&&ev.end&&ev.end<now;
+    }catch(e){return!1}
+  };
+
+  Card.prototype._rnrApplyTimelineAutoScroll=function(){
+    if(!this._autoScroll||this._rnrTimelineAutoScrolled)return;
+    const m=this._rnrViewMode;
+    if(!(m==="timelineDay"||m==="timelineWeek"||m==="timeline"||m==="skylight_tl"))return;
+    const body=this.renderRoot&&this.renderRoot.querySelector?this.renderRoot.querySelector(".timelineBody"):null;
+    if(!body||this._rnrTimelinePendingScrollTop==null)return;
+    const max=Math.max(0,body.scrollHeight-body.clientHeight);
+    body.scrollTop=Math.max(0,Math.min(max,this._rnrTimelinePendingScrollTop));
+    this._rnrTimelineAutoScrolled=!0;
+  };
+
+  const _origUpdated=Card.prototype.updated;
+  Card.prototype.updated=function(changedProperties){
+    if(_origUpdated)_origUpdated.call(this,changedProperties);
+    queueMicrotask(()=>{try{this._rnrApplyTimelineAutoScroll()}catch(e){}});
+  };
+
   Card.prototype._rnrRenderScheduleDays=function(){
     if(!this._days) return W``;
 
@@ -2357,6 +2385,7 @@ _closeDialog(){this._currentEventDetails=null,this._rnrEditOpen=!1,this._rnrEdit
       .day.schedule .scheduleDot{width:10px; height:10px; border-radius:50%; margin-top:4px; background:var(--border-color);}
       .day.schedule .scheduleLeft{display:flex; align-items:flex-start; gap:10px;}
       .day.schedule .eventRow{cursor:pointer;}
+      .day.schedule .eventRow.scheduleDimPast{opacity:.45;filter:grayscale(.25);}
     </style>`;
 
     return W`
@@ -2394,7 +2423,7 @@ _closeDialog(){this._currentEventDetails=null,this._rnrEditOpen=!1,this._rnrEdit
                 if(this._maxDayEvents>0 && rows.length>this._maxDayEvents){ rows=rows.slice(0,this._maxDayEvents); limited=true; }
                 return W`
                   ${rows.map(ev=>W`
-                    <div class="scheduleRow eventRow ${ev.class}" style="--border-color: ${ev.colors[0]}"
+                    <div class="scheduleRow eventRow ${ev.class}${this._rnrIsPastEventToday(ev,d.date)?" scheduleDimPast":""}" style="--border-color: ${ev.colors[0]}"
                          @click="${(clickEv)=>{this._handleEventClick(ev,clickEv)}}">
                       <div class="scheduleLeft">
                         <div class="scheduleDot" style="--border-color:${ev.colors[0]}"></div>
@@ -2537,6 +2566,15 @@ const pxPerMin = hourHeight / 60;
     const windowStartMin = startH * 60;
     const windowEndMin = endH * 60;
 
+    const now = eh.DateTime.now();
+    const nowMin = now.hour * 60 + now.minute + now.second / 60;
+    const todayIndex = dayLayouts.findIndex((dl) => dl.day && dl.day.date && this._isToday(dl.day.date));
+    const showNowLine = !!this._showCurrentTimeBoundary && todayIndex >= 0 && nowMin > windowStartMin && nowMin < windowEndMin;
+    const nowTopPx = (nowMin - windowStartMin) * pxPerMin;
+    if (this._autoScroll) {
+      this._rnrTimelinePendingScrollTop = Math.max(0, (nowMin - windowStartMin) * pxPerMin - hourHeight);
+    }
+
     const style=W`<style>
       .timelineWrap{display:flex;flex-direction:column;gap:8px;width:100%;min-width:0;}
       .timelineHeader{display:grid;grid-template-columns:${labelW}px repeat(${dayCount},1fr);gap:8px;align-items:end;width:100%;min-width:0;}
@@ -2555,6 +2593,8 @@ const pxPerMin = hourHeight / 60;
       .timelineEvent .time{font-size:0.9em;opacity:0.9;}
       .timelineEvent .title{font-weight:600;white-space:normal;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;}
       .timelineEvent .loc{font-size:0.75em;opacity:.75;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-top:2px;}.timelineEvent .desc{font-size:0.78em;opacity:.85;white-space:normal;overflow:hidden;display:-webkit-box;-webkit-line-clamp:4;-webkit-box-orient:vertical;word-break:break-word;overflow-wrap:anywhere;margin-top:2px;}
+      .timelineEvent.timelineDimPast{opacity:.45;filter:grayscale(.25);}
+      .timelineNowLine{position:absolute;height:2px;background:#e53935;z-index:3;pointer-events:none;box-shadow:0 0 0 1px rgba(255,255,255,.35);}
 
     </style>`;
 
@@ -2596,6 +2636,8 @@ const pxPerMin = hourHeight / 60;
               </div>`;
             })}
 
+            ${showNowLine ? W`<div class="timelineNowLine" style="top:${nowTopPx}px; left:calc(${colWExpr(todayIndex)} + 6px); width:calc(${baseWExpr} - 12px);"></div>` : W``}
+
             ${dayLayouts.map((dl,dayIndex)=>{
               return dl.timed.map((it)=>{
                 const ev=it.e;
@@ -2604,6 +2646,8 @@ const pxPerMin = hourHeight / 60;
                 if (eMin <= windowStartMin || sMin >= windowEndMin) return W``;
                 const topPx = (sMin - windowStartMin)*pxPerMin;
                 const hPx = Math.max(18, (eMin - sMin)*pxPerMin);
+                const dimPast = this._rnrIsPastEventToday(ev, dl.day.date) ? " timelineDimPast" : "";
+                const evClass = ev.class ? ` ${ev.class}` : "";
 
                 const leftExpr = `calc(${colWExpr(dayIndex)} + (${it.col} * (${baseWExpr} / ${it.colCount})) + 6px)`;
                 const widthExpr = `calc((${baseWExpr} / ${it.colCount}) - 12px)`;
@@ -2611,7 +2655,7 @@ const pxPerMin = hourHeight / 60;
                 const timeLabel = `${fmtTime(ev.start)} - ${fmtTime(ev.end)}`;
                 const descRaw = (ev.description ?? ev.ce?.description ?? ev.extendedProps?.description ?? ev.ce?.extendedProps?.description ?? "").toString();
                 const desc = descRaw.trim();
-                return W`<div class="timelineEvent"
+                return W`<div class="timelineEvent${evClass}${dimPast}"
                   style="top:${topPx}px; height:${hPx}px; left:${leftExpr}; width:${widthExpr}; --border-color:${ev.colors?.[0]||'#999'}"
                   @click=${(e)=>{e.stopPropagation();this._handleEventClick(ev.ce||ev,e);}}>
                     <div class="title">${ev.summary||"(no title)"}</div>
