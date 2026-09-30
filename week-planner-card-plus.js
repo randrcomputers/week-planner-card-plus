@@ -884,10 +884,13 @@ customElements.define("week-planner-card-plus",class extends es{static styles=i8
                         `:""}
                 </div>
                 <div class="rnr-actions">
+                    ${this._rnrEventActionEntity() && this._rnrCalendarSupportsFeature(this._rnrEventActionEntity(), 4) ? W`
                     <ha-button @click="${this._rnrOpenEditDialog}">
                         <ha-icon icon="mdi:pencil"></ha-icon>
                         ${window.__wpc_i18n_t(this,"Edit")}
                     </ha-button>
+                    ` : W``}
+                    ${this._rnrAnyCalendarSupportsFeature(1) ? W`
                     <ha-button
                     @click="${() => {
                       const e = this._currentEventDetails || {};
@@ -899,11 +902,13 @@ customElements.define("week-planner-card-plus",class extends es{static styles=i8
                     <ha-icon icon="mdi:plus"></ha-icon>
                     ${window.__wpc_i18n_t(this,"Add")}
                   </ha-button>
-                  
+                    ` : W``}
+                    ${this._rnrEventActionEntity() && this._rnrCalendarSupportsFeature(this._rnrEventActionEntity(), 2) ? W`
                   <ha-button @click="${this._rnrDeleteCurrentEvent}">
                         <ha-icon icon="mdi:delete"></ha-icon>
                         ${window.__wpc_i18n_t(this,"Delete")}
                     </ha-button>
+                    ` : W``}
                     <ha-button @click="${this._closeDialog}">
                         ${window.__wpc_i18n_t(this,"Close")}
                     </ha-button>
@@ -1124,6 +1129,35 @@ _rnrRenderDeleteDialog(){
     `;
 }
 
+// CalendarEntityFeature: CREATE_EVENT=1, DELETE_EVENT=2, UPDATE_EVENT=4
+_rnrEventActionEntity(){
+    const e=this._currentEventDetails||{};
+    return e._rnrClickedEntity||this._rnrLastClickedEntity||e.calendar||e.entity||(e.calendars&&e.calendars[0])||null;
+}
+_rnrCalendarSupportedFeatures(entityId){
+    try{
+        if(!entityId||!this.hass?.states) return null;
+        const st=this.hass.states[entityId];
+        if(!st) return null;
+        const f=st.attributes?.supported_features;
+        if(f==null) return null;
+        return Number(f)||0;
+    }catch(_e){ return null; }
+}
+_rnrCalendarSupportsFeature(entityId, bit){
+    // ICS Calendar Tools can update Local .ics even when feature bits are incomplete.
+    if(bit===4 && this._rnrIcsEditableEntities?.has(entityId)) return !0;
+    const f=this._rnrCalendarSupportedFeatures(entityId);
+    // Unknown/missing → keep prior UX (show the button); only hide when bits are present and clear.
+    if(f===null) return !0;
+    return (f & bit) !== 0;
+}
+_rnrAnyCalendarSupportsFeature(bit){
+    const cals=this._calendars||[];
+    if(!cals.length) return this._rnrCalendarSupportsFeature(null, bit);
+    return cals.some(c=>this._rnrCalendarSupportsFeature(c.entity, bit));
+}
+
 // --- R&R patch: determine integration platform (google/local_calendar/caldav/etc) via entity registry ---
 async _rnrGetEntityPlatform(entityId){
     try{
@@ -1164,6 +1198,12 @@ _rnrOpenEditDialog(){
     const oldEnd=e.originalEnd?.toISO?.({suppressMilliseconds:!0})||e.end?.toISO?.({suppressMilliseconds:!0})||null;
     let firstCal=(e._rnrClickedEntity||e.calendar||e.entity||(e.calendars&&e.calendars.length?e.calendars[0]:null));
     if(!firstCal && this._calendars&&this._calendars.length){ firstCal=this._calendars[0].entity; }
+
+    // Google (and some others) expose CREATE+DELETE but not UPDATE_EVENT — don't open a doomed edit dialog.
+    if(firstCal && !this._rnrCalendarSupportsFeature(firstCal, 4)){
+        alert(window.__wpc_i18n_t(this, "This calendar does not support editing events from Home Assistant (no UPDATE_EVENT). You can still add or delete if those are supported."));
+        return;
+    }
 
     // CalDAV events commonly come through HA with uid=null. Without a UID, HA cannot update/edit the event.
     const uidNow = e.uid ?? e.id ?? e.event_id ?? null;

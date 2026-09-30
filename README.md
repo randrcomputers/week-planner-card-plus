@@ -1,6 +1,6 @@
 # Week Planner Card Plus
 
-**Current release: v2.0.13**
+**Current release: v2.0.14**
 
 **Week Planner Card Plus** is a fork of the excellent **Week Planner Card** by FamousWolf, with extra features aimed at a **Skylight-style family calendar dashboard**.  
 This “Plus” version adds UI behavior needed for our Skylight dashboard setup (for example: a working **Add button** + **hash-based popup routing** fixes), and it can be used with both **cloud calendars** (Google / CalDAV / etc.) and **Local Calendar (.ics)**.
@@ -37,6 +37,10 @@ For Local Calendar `.ics` add/edit/delete support, it’s designed to pair nicel
 ---
 
 ## Recent updates (September 2026)
+
+### v2.0.14 — Hide Edit when UPDATE_EVENT unsupported ([#10](https://github.com/randrcomputers/week-planner-card-plus/issues/10))
+
+Google calendars often report `supported_features: 3` (create + delete) but not `UPDATE_EVENT` (4). The event dialog no longer shows **Edit** in that case (Add/Delete still appear when those bits are set). Thanks [@tritanium73](https://github.com/tritanium73).
 
 ### v2.0.13 — Timeline auto-scroll and “now” line ([#9](https://github.com/randrcomputers/week-planner-card-plus/issues/9))
 
@@ -145,6 +149,7 @@ If a gap is still reported, check whether **Hide days without events** is enable
 
 | Version | Notes |
 |---------|--------|
+| 2.0.14 | Hide **Edit** when calendar lacks `UPDATE_EVENT` (`supported_features` bit 4); also gate Add/Delete on CREATE/DELETE ([#10](https://github.com/randrcomputers/week-planner-card-plus/issues/10)) |
 | 2.0.13 | Timeline `autoScroll`, `dimPastEvents`, `showCurrentTimeBoundary` ([#9](https://github.com/randrcomputers/week-planner-card-plus/issues/9)) |
 | 2.0.12 | `soonTime` class; timeline `startHour`/`endHour`; document `combineSimilarEvents` |
 | 2.0.11 | Local Calendar native WS edit; series-safe recurring edit/delete ([PR #6](https://github.com/randrcomputers/week-planner-card-plus/pull/6) by [@enieuwy](https://github.com/enieuwy)) |
@@ -167,6 +172,7 @@ If a gap is still reported, check whether **Hide days without events** is enable
 - **[@treiners](https://github.com/treiners)** — [#5](https://github.com/randrcomputers/week-planner-card-plus/issues/5): timeline `startHour` / `endHour` (v2.0.12)
 - **[@steelincable](https://github.com/steelincable)** — [#8](https://github.com/randrcomputers/week-planner-card-plus/issues/8): clarify `combineSimilarEvents` for multi-calendar lunch menus (v2.0.12)
 - **[@sebeard](https://github.com/sebeard)** — [#9](https://github.com/randrcomputers/week-planner-card-plus/issues/9): timeline auto-scroll, dim past events, now line (v2.0.13)
+- **[@tritanium73](https://github.com/tritanium73)** — [#10](https://github.com/randrcomputers/week-planner-card-plus/issues/10): hide Edit when `UPDATE_EVENT` unsupported (v2.0.14)
 
 ---
 
