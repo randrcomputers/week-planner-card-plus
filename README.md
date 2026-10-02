@@ -1,6 +1,6 @@
 # Week Planner Card Plus
 
-**Current release: v2.0.14**
+**Current release: v2.0.15**
 
 **Week Planner Card Plus** is a fork of the excellent **Week Planner Card** by FamousWolf, with extra features aimed at a **Skylight-style family calendar dashboard**.  
 This “Plus” version adds UI behavior needed for our Skylight dashboard setup (for example: a working **Add button** + **hash-based popup routing** fixes), and it can be used with both **cloud calendars** (Google / CalDAV / etc.) and **Local Calendar (.ics)**.
@@ -35,6 +35,12 @@ For Local Calendar `.ics` add/edit/delete support, it’s designed to pair nicel
   https://github.com/randrcomputers/ics-calendar-tools
 
 ---
+
+## Recent updates (October 2026)
+
+### v2.0.15 — Recurring edit timezone mismatch
+
+Fix Home Assistant `invalid_format` when editing a recurring Local Calendar occurrence: `dtstart`/`dtend` are now normalized to the same timezone (HA rejects mixed naive vs `+02:00` values).
 
 ## Recent updates (September 2026)
 
@@ -149,6 +155,7 @@ If a gap is still reported, check whether **Hide days without events** is enable
 
 | Version | Notes |
 |---------|--------|
+| 2.0.15 | Recurring edit: normalize `dtstart`/`dtend` timezones for calendar WS update |
 | 2.0.14 | Hide **Edit** when calendar lacks `UPDATE_EVENT` (`supported_features` bit 4); also gate Add/Delete on CREATE/DELETE ([#10](https://github.com/randrcomputers/week-planner-card-plus/issues/10)) |
 | 2.0.13 | Timeline `autoScroll`, `dimPastEvents`, `showCurrentTimeBoundary` ([#9](https://github.com/randrcomputers/week-planner-card-plus/issues/9)) |
 | 2.0.12 | `soonTime` class; timeline `startHour`/`endHour`; document `combineSimilarEvents` |

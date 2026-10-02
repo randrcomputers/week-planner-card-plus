@@ -1225,6 +1225,9 @@ _rnrOpenEditDialog(){
         draftSummary=this._rnrApiEventSummary({summary:e.summary,title:e.title,description:e.description},calCfg)||"";
     }
     const draftLocation=(e.location!=null?String(e.location):"").trim();
+    // Timed events: keep start/end in HA timezone with matching offsets (WS rejects mixed naive/+offset).
+    const draftStart=e.fullDay?oldStart:this._rnrIsoInHassTz(oldStart);
+    const draftEnd=e.fullDay?oldEnd:this._rnrIsoInHassTz(oldEnd);
 this._rnrEditDraft={
         // identity / target
         uid:e.uid??null,
@@ -1242,15 +1245,15 @@ this._rnrEditDraft={
 
         // old match fields
         old_summary:e.summary??null,
-        old_start:oldStart,
-        old_end:oldEnd,
+        old_start:draftStart,
+        old_end:draftEnd,
         old_location:e.location??null,
         old_description:e.description??null,
 
         // new fields (title/location: same sources as grid + API)
         summary:draftSummary,
-        start:oldStart,
-        end:oldEnd,
+        start:draftStart,
+        end:draftEnd,
         location:draftLocation,
         description:(e.description!=null?String(e.description):""),
         ...repeatFields
@@ -1547,6 +1550,43 @@ _rnrRepeatFieldsFromParsed(p){
     else if(p.untilDate){out.repeat_end_type="until";out.repeat_until=p.untilDate}
     return out;
 }
+/** Normalize timed dtstart/dtend for calendar/* WS (HA requires matching timezones). */
+_rnrNormalizeWsDatePair(start, end){
+    try{
+        const tz=this.hass?.config?.time_zone||null;
+        const parse=(raw)=>{
+            if(raw==null||raw==="") return null;
+            const s=String(raw);
+            let dt=eh.DateTime.fromISO(s,{setZone:!0});
+            if(!dt.isValid){
+                // datetime-local / floating local → interpret in HA timezone
+                dt=eh.DateTime.fromISO(s,{zone:tz||"local"});
+            }
+            return dt.isValid?dt:null;
+        };
+        let s=parse(start), e=parse(end);
+        if(!s||!e) return {dtstart:start, dtend:end};
+        if(tz){ s=s.setZone(tz); e=e.setZone(tz); }
+        return {
+            dtstart:s.toISO({suppressMilliseconds:!0, includeOffset:!0}),
+            dtend:e.toISO({suppressMilliseconds:!0, includeOffset:!0}),
+        };
+    }catch(_err){
+        return {dtstart:start, dtend:end};
+    }
+}
+_rnrIsoInHassTz(raw){
+    try{
+        if(raw==null||raw==="") return raw;
+        const tz=this.hass?.config?.time_zone||null;
+        let dt=eh.DateTime.fromISO(String(raw),{setZone:!0});
+        if(!dt.isValid) dt=eh.DateTime.fromISO(String(raw),{zone:tz||"local"});
+        if(!dt.isValid) return raw;
+        if(tz) dt=dt.setZone(tz);
+        return dt.toISO({suppressMilliseconds:!0, includeOffset:!0});
+    }catch(_e){ return raw; }
+}
+
 _rnrBuildRRuleFromDraft(d){
     try{
         if(!d) return null;
@@ -1639,7 +1679,6 @@ async _rnrSaveEdit(){
         // If we have a UID, do a true update.
         if(payload.uid){
             const allDayU = !!d.all_day;
-            const normU = (s)=> s ? ((s+"").replace(".000Z","").replace(/Z$/,"")) : s;
             const wsEvtU = {
                 summary:(payload.summary ?? "") || "",
                 description:(payload.description ?? "") || "",
@@ -1651,7 +1690,9 @@ async _rnrSaveEdit(){
                 if(edU===sdU){ try{ const dtU=new Date(sdU+"T00:00:00"); dtU.setDate(dtU.getDate()+1); edU=dtU.toISOString().slice(0,10); }catch(_e){} }
                 wsEvtU.dtstart=sdU; wsEvtU.dtend=edU;
             }else{
-                wsEvtU.dtstart=normU(payload.start); wsEvtU.dtend=normU(payload.end);
+                // Do not strip Z from one side only — HA rejects mixed naive/+offset pairs.
+                const pairU=this._rnrNormalizeWsDatePair(payload.start, payload.end);
+                wsEvtU.dtstart=pairU.dtstart; wsEvtU.dtend=pairU.dtend;
             }
 
             if(d._isRecurring){
@@ -1763,20 +1804,15 @@ async _rnrSaveEdit(){
             try{
                 const rrRaw = ((payload.rrule||payload.recurrence_rule||"")+"").trim();
                 const rr = rrRaw.replace(/^RRULE:/i,"").trim();
-                const norm = (s)=>{
-                    if(!s) return s;
-                    let out = (s+"");
-                    out = out.replace(".000Z","").replace(/Z$/,"");
-                    return out;
-                };
                 if(this.hass?.connection?.sendMessagePromise && rr){
+                    const pairC=allDay?null:this._rnrNormalizeWsDatePair(payload.start, payload.end);
                     const wsEvt = {
                         summary: (payload.summary ?? "") || "",
                         description: (payload.description ?? "") || "",
                         location: (payload.location ?? "") || "",
                         rrule: rr,
-                        dtstart: (allDay ? startForIcs : norm(payload.start)),
-                        dtend: (allDay ? endForIcs : norm(payload.end))
+                        dtstart: (allDay ? startForIcs : pairC.dtstart),
+                        dtend: (allDay ? endForIcs : pairC.dtend)
                     };
                     await this.hass.connection.sendMessagePromise({type:"calendar/event/create", entity_id: cal, event: wsEvt});
                     did = true;
@@ -1872,8 +1908,9 @@ _rnrRenderEditDialog(){
     };
     const fromDTLocal=(v)=>{
         if(!v) return null;
-        // datetime-local -> ISO-ish (no timezone). Keep seconds for stability.
-        return v.length===16 ? (v+":00") : v;
+        // datetime-local is zone-less; store in HA timezone with offset so start/end stay consistent for WS.
+        const withSec=v.length===16?(v+":00"):v;
+        return this._rnrIsoInHassTz(withSec);
     };
 
     const toDateLocal=(iso)=>{
