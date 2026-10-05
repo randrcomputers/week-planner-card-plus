@@ -2,7 +2,7 @@
    Prevents: Failed to execute 'define' ... name 'week-planner-card-plus' has already been used
    This can happen if the same JS is loaded twice (different URL, cache-busted params, or both YAML+UI resources).
 */
-console.info("[week-planner-card-plus] loaded patched build 2026-08-29 (soonTime + startHour/endHour)");
+console.info("[week-planner-card-plus] loaded patched build 2026-10-05 (v2.0.16 timelineHourHeight)");
 (()=>{try{
   const ce = globalThis.customElements;
   if(!ce||!ce.define||!ce.get) return;
@@ -706,7 +706,7 @@ window.__wpc_i18n_apply = (card) => {
 };
 /* ===== end i18n helper ===== */
 
-customElements.define("week-planner-card-plus",class extends es{static styles=i8;_initialized=!1;_loading=0;_events={};_calendarEvents={};_calendars;_numberOfDays;_numberOfDaysIsMonth;_updateInterval;_noCardBackground;_eventBackground;_compact;_language;_weather;_dateFormat;_timeFormat;_locationLink;_startDate;_hideWeekend;_startingDay;_startingDayOffset;_weatherForecast=null;_showLocation;_hidePastEvents;_hideDaysWithoutEvents;_hideTodayWithoutEvents;_filter;_filterText;_replaceTitleText;_combineSimilarEvents;_soonTime;_startHour;_endHour;_showLegend;_legendToggle;_actions;_columns;_loader;_showNavigation;_navigationOffset=0;_updateEventsTimeouts=[];static getConfigElement(){return document.createElement("week-planner-card-plus-editor")}static getStubConfig(){return{calendars:[],days:7,startingDay:"today",startingDayOffset:0,showWeekDayText:!0,hideWeekend:!1,noCardBackground:!1,compact:!1,weather:{showCondition:!0,showTemperature:!1,showLowTemperature:!1,roundTemperature:!1,useTwiceDaily:!1},locale:"en",showLocation:!1,hidePastEvents:!1,hideDaysWithoutEvents:!1,hideTodayWithoutEvents:!1,combineSimilarEvents:!1,soonTime:"00:00",startHour:0,endHour:24,showLegend:!1,tapEmptyDayToAdd:!1,clickEmptyDayToAddPlus:!1,defaultAllDay:!1}}static get properties(){return{_days:{type:Array},_config:{type:Object},_error:{type:String},_currentEventDetails:{type:Object},_hideCalendars:{type:Array},_rnrEditOpen:{type:Boolean},_rnrEditDraft:{type:Object}}}setConfig(e){if(this._config=e,!e.calendars)throw Error("No calendars are configured");this._numberOfDaysIsMonth=this._isNumberOfDaysMonth(e.days??7),this._title=e.title??null,this._calendars=e.calendars,this._weather=this._getWeatherConfig(e.weather),this._numberOfDays=this._getNumberOfDays(e.days??7),this._hideWeekend=e.hideWeekend??!1,this._showNavigation=e.showNavigation??!1,this._startingDay=e.startingDay??"today",this._startingDayOffset=e.startingDayOffset??0,this._showWeekDayText=e.showWeekDayText??!0,this._startDate=this._getStartDate(),this._updateInterval=e.updateInterval??60,this._noCardBackground=e.noCardBackground??!1,this._eventBackground=e.eventBackground??"var(--card-background-color, inherit)",this._compact=e.compact??!1,this._dayFormat=e.dayFormat??null,this._dateFormat=e.dateFormat??"cccc d LLLL yyyy",this._timeFormat=e.timeFormat??"HH:mm",this._locationLink=e.locationLink??"https://www.google.com/maps/search/?api=1&query=",this._showTitle=e.showTitle??!0,this._showDescription=e.showDescription??!1,this._showLocation=e.showLocation??!1,this._hidePastEvents=e.hidePastEvents??!1,this._hideDaysWithoutEvents=e.hideDaysWithoutEvents??!1,this._hideTodayWithoutEvents=e.hideTodayWithoutEvents??!1,this._filter=e.filter??!1,this._filterText=e.filterText??!1,this._replaceTitleText=e.replaceTitleText??!1,this._combineSimilarEvents=e.combineSimilarEvents??!1,this._soonTime="string"==typeof e.soonTime&&/^(?:[01]?\d|2[0-3]):[0-5]\d$/.test(e.soonTime)?e.soonTime.padStart(5,"0"):"00:00",this._startHour=(()=>{const v=e.startHour??e.timelineStartHour;if(v==null||v==="")return 0;if("string"==typeof v&&"auto"===v.toLowerCase().trim())return"auto";const n=Number(v);return Number.isFinite(n)?Math.max(0,Math.min(23,Math.floor(n))):0})(),this._endHour=(()=>{const v=e.endHour??e.timelineEndHour;if(v==null||v==="")return 24;if("string"==typeof v&&"auto"===v.toLowerCase().trim())return"auto";const n=Number(v);return Number.isFinite(n)?Math.max(1,Math.min(24,Math.floor(n))):24})(),this._showLegend=e.showLegend??!1,this._legendToggle=e.legendToggle??!1,this._actions=e.actions??!1,this._columns=e.columns??{},this._maxEvents=e.maxEvents??!1,this._maxDayEvents=e.maxDayEvents??!1,this._hideCalendars=(e.calendars||[]).reduce((e,t)=>(t.initiallyHidden&&t.entity&&e.push(t.entity),e),[]),e.locale&&(eh.Settings.defaultLocale=e.locale),this._language=Object.assign({},{fullDay:"Entire day",noEvents:"No events",moreEvents:"More events",today:"Today",tomorrow:"Tomorrow",yesterday:"Yesterday",sunday:eh.Info.weekdays("long")[6],monday:eh.Info.weekdays("long")[0],tuesday:eh.Info.weekdays("long")[1],wednesday:eh.Info.weekdays("long")[2],thursday:eh.Info.weekdays("long")[3],friday:eh.Info.weekdays("long")[4],saturday:eh.Info.weekdays("long")[5]},e.texts??{}),this._calendarErrors=[],this._rnrTapEmptyDayToAdd=e.tapEmptyDayToAdd??!1,this._rnrClickEmptyDayToAddPlus=e.clickEmptyDayToAddPlus??!1,this._rnrDefaultAllDay=e.defaultAllDay??!1,this.__rnrCfgLogged||(console.info('[week-planner-card-plus] cfg tapEmptyDayToAdd=',this._rnrTapEmptyDayToAdd,' clickEmptyDayToAddPlus=',this._rnrClickEmptyDayToAddPlus),this.__rnrCfgLogged=!0),this._rnrAddEventPopupHash=e.addEventPopupHash??"#addcalendarevent",this._rnrAddEventHelpers=e.addEventHelpers??null,this._daysFromConfig=e.days,this._responsive=e.responsive??!1,this._minDayWidth=e.minDayWidth??120,this._maxDays=e.maxDays??7,this._applyResponsiveDays&&queueMicrotask?queueMicrotask(()=>this._applyResponsiveDays()):setTimeout(()=>{this._applyResponsiveDays&&this._applyResponsiveDays()},0)}connectedCallback(){super.connectedCallback&&super.connectedCallback();this._setupResponsive&&this._setupResponsive();}disconnectedCallback(){this._teardownResponsive&&this._teardownResponsive();super.disconnectedCallback&&super.disconnectedCallback();}_setupResponsive(){if(!this._responsive)return;if(this._resizeObs)return;try{this._resizeObs=new ResizeObserver(()=>{this._applyResponsiveDays&&this._applyResponsiveDays()});this._resizeObs.observe(this)}catch(e){this._winResizeHandler=()=>{this._applyResponsiveDays&&this._applyResponsiveDays()};window.addEventListener('resize',this._winResizeHandler)}}_teardownResponsive(){if(this._resizeObs){try{this._resizeObs.disconnect()}catch(e){}this._resizeObs=null}if(this._winResizeHandler){window.removeEventListener('resize',this._winResizeHandler);this._winResizeHandler=null}}_applyResponsiveDays(){if(!this._responsive)return;if(this._daysFromConfig&&this._isNumberOfDaysMonth(this._daysFromConfig))return;let e=0;try{e=this.getBoundingClientRect().width}catch(t){}e=e||this.offsetWidth||window.innerWidth||0;if(!e)return;let t=Number(this._minDayWidth)||120,n=Number(this._maxDays)||7;let r=Math.floor(e/t);r<1&&(r=1),r>n&&(r=n);this._numberOfDays!==r&&(this._numberOfDays=r,this.requestUpdate&&this.requestUpdate())}_isNumberOfDaysMonth(e){return"month"===String(e).toLowerCase().trim()}_getWeatherConfig(e){if(!e||"string"!=typeof e&&"object"!=typeof e)return null;let t={entity:null,showCondition:!0,showTemperature:!1,showLowTemperature:!1,roundTemperature:!1};return("string"==typeof e?t.entity=e:Object.assign(t,e),t.hasOwnProperty("entity")&&null!==t.entity)?t:null}render(){this._loader||(this._loader=this._getLoader()),this._initialized||(this._initialized=!0,this._waitForHassAndConfig());let e=[];this._noCardBackground&&e.push("nobackground"),this._compact&&e.push("compact");let t=["--event-background-color: "+this._eventBackground+";"];return this._columns.extraLarge&&t.push("--days-columns: "+this._columns.extraLarge+";"),this._columns.large&&t.push("--days-columns-lg: "+this._columns.large+";"),this._columns.medium&&t.push("--days-columns-md: "+this._columns.medium+";"),this._columns.small&&t.push("--days-columns-sm: "+this._columns.small+";"),this._columns.extraSmall&&t.push("--days-columns-xs: "+this._columns.extraSmall+";"),W`
+customElements.define("week-planner-card-plus",class extends es{static styles=i8;_initialized=!1;_loading=0;_events={};_calendarEvents={};_calendars;_numberOfDays;_numberOfDaysIsMonth;_updateInterval;_noCardBackground;_eventBackground;_compact;_language;_weather;_dateFormat;_timeFormat;_locationLink;_startDate;_hideWeekend;_startingDay;_startingDayOffset;_weatherForecast=null;_showLocation;_hidePastEvents;_hideDaysWithoutEvents;_hideTodayWithoutEvents;_filter;_filterText;_replaceTitleText;_combineSimilarEvents;_soonTime;_startHour;_endHour;_autoScroll;_dimPastEvents;_showCurrentTimeBoundary;_showLegend;_legendToggle;_actions;_columns;_loader;_showNavigation;_navigationOffset=0;_updateEventsTimeouts=[];static getConfigElement(){return document.createElement("week-planner-card-plus-editor")}static getStubConfig(){return{calendars:[],days:7,startingDay:"today",startingDayOffset:0,showWeekDayText:!0,hideWeekend:!1,noCardBackground:!1,compact:!1,weather:{showCondition:!0,showTemperature:!1,showLowTemperature:!1,roundTemperature:!1,useTwiceDaily:!1},locale:"en",showLocation:!1,hidePastEvents:!1,hideDaysWithoutEvents:!1,hideTodayWithoutEvents:!1,combineSimilarEvents:!1,soonTime:"00:00",startHour:0,endHour:24,autoScroll:!1,dimPastEvents:!1,showCurrentTimeBoundary:!1,showLegend:!1,tapEmptyDayToAdd:!1,clickEmptyDayToAddPlus:!1,defaultAllDay:!1}}static get properties(){return{_days:{type:Array},_config:{type:Object},_error:{type:String},_currentEventDetails:{type:Object},_hideCalendars:{type:Array},_rnrEditOpen:{type:Boolean},_rnrEditDraft:{type:Object}}}setConfig(e){if(this._config=e,!e.calendars)throw Error("No calendars are configured");this._numberOfDaysIsMonth=this._isNumberOfDaysMonth(e.days??7),this._title=e.title??null,this._calendars=e.calendars,this._weather=this._getWeatherConfig(e.weather),this._numberOfDays=this._getNumberOfDays(e.days??7),this._hideWeekend=e.hideWeekend??!1,this._showNavigation=e.showNavigation??!1,this._startingDay=e.startingDay??"today",this._startingDayOffset=e.startingDayOffset??0,this._showWeekDayText=e.showWeekDayText??!0,this._startDate=this._getStartDate(),this._updateInterval=e.updateInterval??60,this._noCardBackground=e.noCardBackground??!1,this._eventBackground=e.eventBackground??"var(--card-background-color, inherit)",this._compact=e.compact??!1,this._dayFormat=e.dayFormat??null,this._dateFormat=e.dateFormat??"cccc d LLLL yyyy",this._timeFormat=e.timeFormat??"HH:mm",this._locationLink=e.locationLink??"https://www.google.com/maps/search/?api=1&query=",this._showTitle=e.showTitle??!0,this._showDescription=e.showDescription??!1,this._showLocation=e.showLocation??!1,this._hidePastEvents=e.hidePastEvents??!1,this._hideDaysWithoutEvents=e.hideDaysWithoutEvents??!1,this._hideTodayWithoutEvents=e.hideTodayWithoutEvents??!1,this._filter=e.filter??!1,this._filterText=e.filterText??!1,this._replaceTitleText=e.replaceTitleText??!1,this._combineSimilarEvents=e.combineSimilarEvents??!1,this._soonTime="string"==typeof e.soonTime&&/^(?:[01]?\d|2[0-3]):[0-5]\d$/.test(e.soonTime)?e.soonTime.padStart(5,"0"):"00:00",this._startHour=(()=>{const v=e.startHour??e.timelineStartHour;if(v==null||v==="")return 0;if("string"==typeof v&&"auto"===v.toLowerCase().trim())return"auto";const n=Number(v);return Number.isFinite(n)?Math.max(0,Math.min(23,Math.floor(n))):0})(),this._endHour=(()=>{const v=e.endHour??e.timelineEndHour;if(v==null||v==="")return 24;if("string"==typeof v&&"auto"===v.toLowerCase().trim())return"auto";const n=Number(v);return Number.isFinite(n)?Math.max(1,Math.min(24,Math.floor(n))):24})(),this._autoScroll=!!e.autoScroll,this._dimPastEvents=!!e.dimPastEvents,this._showCurrentTimeBoundary=!!(e.showCurrentTimeBoundary??e.showNowLine),this._rnrTimelineAutoScrolled=!1,this._showLegend=e.showLegend??!1,this._legendToggle=e.legendToggle??!1,this._actions=e.actions??!1,this._columns=e.columns??{},this._maxEvents=e.maxEvents??!1,this._maxDayEvents=e.maxDayEvents??!1,this._hideCalendars=(e.calendars||[]).reduce((e,t)=>(t.initiallyHidden&&t.entity&&e.push(t.entity),e),[]),e.locale&&(eh.Settings.defaultLocale=e.locale),this._language=Object.assign({},{fullDay:"Entire day",noEvents:"No events",moreEvents:"More events",today:"Today",tomorrow:"Tomorrow",yesterday:"Yesterday",sunday:eh.Info.weekdays("long")[6],monday:eh.Info.weekdays("long")[0],tuesday:eh.Info.weekdays("long")[1],wednesday:eh.Info.weekdays("long")[2],thursday:eh.Info.weekdays("long")[3],friday:eh.Info.weekdays("long")[4],saturday:eh.Info.weekdays("long")[5]},e.texts??{}),this._calendarErrors=[],this._rnrTapEmptyDayToAdd=e.tapEmptyDayToAdd??!1,this._rnrClickEmptyDayToAddPlus=e.clickEmptyDayToAddPlus??!1,this._rnrDefaultAllDay=e.defaultAllDay??!1,this.__rnrCfgLogged||(console.info('[week-planner-card-plus] cfg tapEmptyDayToAdd=',this._rnrTapEmptyDayToAdd,' clickEmptyDayToAddPlus=',this._rnrClickEmptyDayToAddPlus),this.__rnrCfgLogged=!0),this._rnrAddEventPopupHash=e.addEventPopupHash??"#addcalendarevent",this._rnrAddEventHelpers=e.addEventHelpers??null,this._daysFromConfig=e.days,this._responsive=e.responsive??!1,this._minDayWidth=e.minDayWidth??120,this._maxDays=e.maxDays??7,this._applyResponsiveDays&&queueMicrotask?queueMicrotask(()=>this._applyResponsiveDays()):setTimeout(()=>{this._applyResponsiveDays&&this._applyResponsiveDays()},0)}connectedCallback(){super.connectedCallback&&super.connectedCallback();this._setupResponsive&&this._setupResponsive();}disconnectedCallback(){this._teardownResponsive&&this._teardownResponsive();super.disconnectedCallback&&super.disconnectedCallback();}_setupResponsive(){if(!this._responsive)return;if(this._resizeObs)return;try{this._resizeObs=new ResizeObserver(()=>{this._applyResponsiveDays&&this._applyResponsiveDays()});this._resizeObs.observe(this)}catch(e){this._winResizeHandler=()=>{this._applyResponsiveDays&&this._applyResponsiveDays()};window.addEventListener('resize',this._winResizeHandler)}}_teardownResponsive(){if(this._resizeObs){try{this._resizeObs.disconnect()}catch(e){}this._resizeObs=null}if(this._winResizeHandler){window.removeEventListener('resize',this._winResizeHandler);this._winResizeHandler=null}}_applyResponsiveDays(){if(!this._responsive)return;if(this._daysFromConfig&&this._isNumberOfDaysMonth(this._daysFromConfig))return;let e=0;try{e=this.getBoundingClientRect().width}catch(t){}e=e||this.offsetWidth||window.innerWidth||0;if(!e)return;let t=Number(this._minDayWidth)||120,n=Number(this._maxDays)||7;let r=Math.floor(e/t);r<1&&(r=1),r>n&&(r=n);this._numberOfDays!==r&&(this._numberOfDays=r,this.requestUpdate&&this.requestUpdate())}_isNumberOfDaysMonth(e){return"month"===String(e).toLowerCase().trim()}_getWeatherConfig(e){if(!e||"string"!=typeof e&&"object"!=typeof e)return null;let t={entity:null,showCondition:!0,showTemperature:!1,showLowTemperature:!1,roundTemperature:!1};return("string"==typeof e?t.entity=e:Object.assign(t,e),t.hasOwnProperty("entity")&&null!==t.entity)?t:null}render(){this._loader||(this._loader=this._getLoader()),this._initialized||(this._initialized=!0,this._waitForHassAndConfig());let e=[];this._noCardBackground&&e.push("nobackground"),this._compact&&e.push("compact");let t=["--event-background-color: "+this._eventBackground+";"];return this._columns.extraLarge&&t.push("--days-columns: "+this._columns.extraLarge+";"),this._columns.large&&t.push("--days-columns-lg: "+this._columns.large+";"),this._columns.medium&&t.push("--days-columns-md: "+this._columns.medium+";"),this._columns.small&&t.push("--days-columns-sm: "+this._columns.small+";"),this._columns.extraSmall&&t.push("--days-columns-xs: "+this._columns.extraSmall+";"),W`
             <ha-card class="${e.join(" ")}" style="${t.join(" ")}">
                 <div class="card-content">
                     ${this._error?W`<div class="errors"><ha-alert alert-type="error">${this._error}</ha-alert></div>`:""}
@@ -884,10 +884,13 @@ customElements.define("week-planner-card-plus",class extends es{static styles=i8
                         `:""}
                 </div>
                 <div class="rnr-actions">
+                    ${this._rnrEventActionEntity() && this._rnrCalendarSupportsFeature(this._rnrEventActionEntity(), 4) ? W`
                     <ha-button @click="${this._rnrOpenEditDialog}">
                         <ha-icon icon="mdi:pencil"></ha-icon>
                         ${window.__wpc_i18n_t(this,"Edit")}
                     </ha-button>
+                    ` : W``}
+                    ${this._rnrAnyCalendarSupportsFeature(1) ? W`
                     <ha-button
                     @click="${() => {
                       const e = this._currentEventDetails || {};
@@ -899,11 +902,13 @@ customElements.define("week-planner-card-plus",class extends es{static styles=i8
                     <ha-icon icon="mdi:plus"></ha-icon>
                     ${window.__wpc_i18n_t(this,"Add")}
                   </ha-button>
-                  
+                    ` : W``}
+                    ${this._rnrEventActionEntity() && this._rnrCalendarSupportsFeature(this._rnrEventActionEntity(), 2) ? W`
                   <ha-button @click="${this._rnrDeleteCurrentEvent}">
                         <ha-icon icon="mdi:delete"></ha-icon>
                         ${window.__wpc_i18n_t(this,"Delete")}
                     </ha-button>
+                    ` : W``}
                     <ha-button @click="${this._closeDialog}">
                         ${window.__wpc_i18n_t(this,"Close")}
                     </ha-button>
@@ -1124,6 +1129,35 @@ _rnrRenderDeleteDialog(){
     `;
 }
 
+// CalendarEntityFeature: CREATE_EVENT=1, DELETE_EVENT=2, UPDATE_EVENT=4
+_rnrEventActionEntity(){
+    const e=this._currentEventDetails||{};
+    return e._rnrClickedEntity||this._rnrLastClickedEntity||e.calendar||e.entity||(e.calendars&&e.calendars[0])||null;
+}
+_rnrCalendarSupportedFeatures(entityId){
+    try{
+        if(!entityId||!this.hass?.states) return null;
+        const st=this.hass.states[entityId];
+        if(!st) return null;
+        const f=st.attributes?.supported_features;
+        if(f==null) return null;
+        return Number(f)||0;
+    }catch(_e){ return null; }
+}
+_rnrCalendarSupportsFeature(entityId, bit){
+    // ICS Calendar Tools can update Local .ics even when feature bits are incomplete.
+    if(bit===4 && this._rnrIcsEditableEntities?.has(entityId)) return !0;
+    const f=this._rnrCalendarSupportedFeatures(entityId);
+    // Unknown/missing → keep prior UX (show the button); only hide when bits are present and clear.
+    if(f===null) return !0;
+    return (f & bit) !== 0;
+}
+_rnrAnyCalendarSupportsFeature(bit){
+    const cals=this._calendars||[];
+    if(!cals.length) return this._rnrCalendarSupportsFeature(null, bit);
+    return cals.some(c=>this._rnrCalendarSupportsFeature(c.entity, bit));
+}
+
 // --- R&R patch: determine integration platform (google/local_calendar/caldav/etc) via entity registry ---
 async _rnrGetEntityPlatform(entityId){
     try{
@@ -1165,6 +1199,12 @@ _rnrOpenEditDialog(){
     let firstCal=(e._rnrClickedEntity||e.calendar||e.entity||(e.calendars&&e.calendars.length?e.calendars[0]:null));
     if(!firstCal && this._calendars&&this._calendars.length){ firstCal=this._calendars[0].entity; }
 
+    // Google (and some others) expose CREATE+DELETE but not UPDATE_EVENT — don't open a doomed edit dialog.
+    if(firstCal && !this._rnrCalendarSupportsFeature(firstCal, 4)){
+        alert(window.__wpc_i18n_t(this, "This calendar does not support editing events from Home Assistant (no UPDATE_EVENT). You can still add or delete if those are supported."));
+        return;
+    }
+
     // CalDAV events commonly come through HA with uid=null. Without a UID, HA cannot update/edit the event.
     const uidNow = e.uid ?? e.id ?? e.event_id ?? null;
     if(!uidNow){
@@ -1185,6 +1225,9 @@ _rnrOpenEditDialog(){
         draftSummary=this._rnrApiEventSummary({summary:e.summary,title:e.title,description:e.description},calCfg)||"";
     }
     const draftLocation=(e.location!=null?String(e.location):"").trim();
+    // Timed events: keep start/end in HA timezone with matching offsets (WS rejects mixed naive/+offset).
+    const draftStart=e.fullDay?oldStart:this._rnrIsoInHassTz(oldStart);
+    const draftEnd=e.fullDay?oldEnd:this._rnrIsoInHassTz(oldEnd);
 this._rnrEditDraft={
         // identity / target
         uid:e.uid??null,
@@ -1202,15 +1245,15 @@ this._rnrEditDraft={
 
         // old match fields
         old_summary:e.summary??null,
-        old_start:oldStart,
-        old_end:oldEnd,
+        old_start:draftStart,
+        old_end:draftEnd,
         old_location:e.location??null,
         old_description:e.description??null,
 
         // new fields (title/location: same sources as grid + API)
         summary:draftSummary,
-        start:oldStart,
-        end:oldEnd,
+        start:draftStart,
+        end:draftEnd,
         location:draftLocation,
         description:(e.description!=null?String(e.description):""),
         ...repeatFields
@@ -1507,6 +1550,43 @@ _rnrRepeatFieldsFromParsed(p){
     else if(p.untilDate){out.repeat_end_type="until";out.repeat_until=p.untilDate}
     return out;
 }
+/** Normalize timed dtstart/dtend for calendar/* WS (HA requires matching timezones). */
+_rnrNormalizeWsDatePair(start, end){
+    try{
+        const tz=this.hass?.config?.time_zone||null;
+        const parse=(raw)=>{
+            if(raw==null||raw==="") return null;
+            const s=String(raw);
+            let dt=eh.DateTime.fromISO(s,{setZone:!0});
+            if(!dt.isValid){
+                // datetime-local / floating local → interpret in HA timezone
+                dt=eh.DateTime.fromISO(s,{zone:tz||"local"});
+            }
+            return dt.isValid?dt:null;
+        };
+        let s=parse(start), e=parse(end);
+        if(!s||!e) return {dtstart:start, dtend:end};
+        if(tz){ s=s.setZone(tz); e=e.setZone(tz); }
+        return {
+            dtstart:s.toISO({suppressMilliseconds:!0, includeOffset:!0}),
+            dtend:e.toISO({suppressMilliseconds:!0, includeOffset:!0}),
+        };
+    }catch(_err){
+        return {dtstart:start, dtend:end};
+    }
+}
+_rnrIsoInHassTz(raw){
+    try{
+        if(raw==null||raw==="") return raw;
+        const tz=this.hass?.config?.time_zone||null;
+        let dt=eh.DateTime.fromISO(String(raw),{setZone:!0});
+        if(!dt.isValid) dt=eh.DateTime.fromISO(String(raw),{zone:tz||"local"});
+        if(!dt.isValid) return raw;
+        if(tz) dt=dt.setZone(tz);
+        return dt.toISO({suppressMilliseconds:!0, includeOffset:!0});
+    }catch(_e){ return raw; }
+}
+
 _rnrBuildRRuleFromDraft(d){
     try{
         if(!d) return null;
@@ -1599,7 +1679,6 @@ async _rnrSaveEdit(){
         // If we have a UID, do a true update.
         if(payload.uid){
             const allDayU = !!d.all_day;
-            const normU = (s)=> s ? ((s+"").replace(".000Z","").replace(/Z$/,"")) : s;
             const wsEvtU = {
                 summary:(payload.summary ?? "") || "",
                 description:(payload.description ?? "") || "",
@@ -1611,7 +1690,9 @@ async _rnrSaveEdit(){
                 if(edU===sdU){ try{ const dtU=new Date(sdU+"T00:00:00"); dtU.setDate(dtU.getDate()+1); edU=dtU.toISOString().slice(0,10); }catch(_e){} }
                 wsEvtU.dtstart=sdU; wsEvtU.dtend=edU;
             }else{
-                wsEvtU.dtstart=normU(payload.start); wsEvtU.dtend=normU(payload.end);
+                // Do not strip Z from one side only — HA rejects mixed naive/+offset pairs.
+                const pairU=this._rnrNormalizeWsDatePair(payload.start, payload.end);
+                wsEvtU.dtstart=pairU.dtstart; wsEvtU.dtend=pairU.dtend;
             }
 
             if(d._isRecurring){
@@ -1723,20 +1804,15 @@ async _rnrSaveEdit(){
             try{
                 const rrRaw = ((payload.rrule||payload.recurrence_rule||"")+"").trim();
                 const rr = rrRaw.replace(/^RRULE:/i,"").trim();
-                const norm = (s)=>{
-                    if(!s) return s;
-                    let out = (s+"");
-                    out = out.replace(".000Z","").replace(/Z$/,"");
-                    return out;
-                };
                 if(this.hass?.connection?.sendMessagePromise && rr){
+                    const pairC=allDay?null:this._rnrNormalizeWsDatePair(payload.start, payload.end);
                     const wsEvt = {
                         summary: (payload.summary ?? "") || "",
                         description: (payload.description ?? "") || "",
                         location: (payload.location ?? "") || "",
                         rrule: rr,
-                        dtstart: (allDay ? startForIcs : norm(payload.start)),
-                        dtend: (allDay ? endForIcs : norm(payload.end))
+                        dtstart: (allDay ? startForIcs : pairC.dtstart),
+                        dtend: (allDay ? endForIcs : pairC.dtend)
                     };
                     await this.hass.connection.sendMessagePromise({type:"calendar/event/create", entity_id: cal, event: wsEvt});
                     did = true;
@@ -1832,8 +1908,9 @@ _rnrRenderEditDialog(){
     };
     const fromDTLocal=(v)=>{
         if(!v) return null;
-        // datetime-local -> ISO-ish (no timezone). Keep seconds for stability.
-        return v.length===16 ? (v+":00") : v;
+        // datetime-local is zone-less; store in HA timezone with offset so start/end stay consistent for WS.
+        const withSec=v.length===16?(v+":00"):v;
+        return this._rnrIsoInHassTz(withSec);
     };
 
     const toDateLocal=(iso)=>{
@@ -2143,6 +2220,10 @@ _closeDialog(){this._currentEventDetails=null,this._rnrEditOpen=!1,this._rnrEdit
                         ${this.addTextField("soonTime","Soon window (HH:MM)","text","00:00")}
                         ${this.addTextField("startHour","Timeline start hour (0-23 or auto)","text","0")}
                         ${this.addTextField("endHour","Timeline end hour (1-24 or auto)","text","24")}
+                        ${this.addTextField("timelineHourHeight","Timeline hour row height in px (default 96)","number","")}
+                        ${this.addBooleanField("autoScroll","Timeline: auto-scroll to current time on load")}
+                        ${this.addBooleanField("dimPastEvents","Timeline: dim today's past events")}
+                        ${this.addBooleanField("showCurrentTimeBoundary","Timeline: show current-time line (today)")}
                         ${this.addBooleanField("showTitle","Show title in overview",!0)}
                         ${this.addBooleanField("showDescription","Show description in overview")}
                         ${this.addBooleanField("showLocation","Show location in overview")}
@@ -2343,6 +2424,31 @@ _closeDialog(){this._currentEventDetails=null,this._rnrEditOpen=!1,this._rnrEdit
     return out;
   };
 
+  Card.prototype._rnrIsPastEventToday=function(ev,dayDate){
+    if(!this._dimPastEvents||!dayDate||!this._isToday(dayDate))return!1;
+    try{
+      const now=eh.DateTime.now();
+      return!ev.fullDay&&ev.end&&ev.end<now;
+    }catch(e){return!1}
+  };
+
+  Card.prototype._rnrApplyTimelineAutoScroll=function(){
+    if(!this._autoScroll||this._rnrTimelineAutoScrolled)return;
+    const m=this._rnrViewMode;
+    if(!(m==="timelineDay"||m==="timelineWeek"||m==="timeline"||m==="skylight_tl"))return;
+    const body=this.renderRoot&&this.renderRoot.querySelector?this.renderRoot.querySelector(".timelineBody"):null;
+    if(!body||this._rnrTimelinePendingScrollTop==null)return;
+    const max=Math.max(0,body.scrollHeight-body.clientHeight);
+    body.scrollTop=Math.max(0,Math.min(max,this._rnrTimelinePendingScrollTop));
+    this._rnrTimelineAutoScrolled=!0;
+  };
+
+  const _origUpdated=Card.prototype.updated;
+  Card.prototype.updated=function(changedProperties){
+    if(_origUpdated)_origUpdated.call(this,changedProperties);
+    queueMicrotask(()=>{try{this._rnrApplyTimelineAutoScroll()}catch(e){}});
+  };
+
   Card.prototype._rnrRenderScheduleDays=function(){
     if(!this._days) return W``;
 
@@ -2357,6 +2463,7 @@ _closeDialog(){this._currentEventDetails=null,this._rnrEditOpen=!1,this._rnrEdit
       .day.schedule .scheduleDot{width:10px; height:10px; border-radius:50%; margin-top:4px; background:var(--border-color);}
       .day.schedule .scheduleLeft{display:flex; align-items:flex-start; gap:10px;}
       .day.schedule .eventRow{cursor:pointer;}
+      .day.schedule .eventRow.scheduleDimPast{opacity:.45;filter:grayscale(.25);}
     </style>`;
 
     return W`
@@ -2394,7 +2501,7 @@ _closeDialog(){this._currentEventDetails=null,this._rnrEditOpen=!1,this._rnrEdit
                 if(this._maxDayEvents>0 && rows.length>this._maxDayEvents){ rows=rows.slice(0,this._maxDayEvents); limited=true; }
                 return W`
                   ${rows.map(ev=>W`
-                    <div class="scheduleRow eventRow ${ev.class}" style="--border-color: ${ev.colors[0]}"
+                    <div class="scheduleRow eventRow ${ev.class}${this._rnrIsPastEventToday(ev,d.date)?" scheduleDimPast":""}" style="--border-color: ${ev.colors[0]}"
                          @click="${(clickEv)=>{this._handleEventClick(ev,clickEv)}}">
                       <div class="scheduleLeft">
                         <div class="scheduleDot" style="--border-color:${ev.colors[0]}"></div>
@@ -2421,21 +2528,21 @@ _closeDialog(){this._currentEventDetails=null,this._rnrEditOpen=!1,this._rnrEdit
     const days=this._days||[];
     if(!days.length) return _origRenderDays.call(this);
 
-    // Hour row height (px). Default was 60; make it roomier for schedule view.
-// You can override via YAML: timelineHourHeight: 80  (or scheduleHourHeight)
-// Or via CSS: --wpcp-timeline-hour-height: 80px;
+    // Hour row height (px). Default 96 (roomier). Override via YAML/editor without changing default:
+//   timelineHourHeight: 60   (aliases: scheduleHourHeight, hourHeight)
+// Or CSS: --wpcp-timeline-hour-height: 60px;
 let hourHeight = 96;
 try {
   const cfg = (this && (this._config || this.config)) || {};
   const cfgHH = cfg.timelineHourHeight ?? cfg.scheduleHourHeight ?? cfg.hourHeight;
   if (cfgHH != null && cfgHH !== "") {
-    const n = Number(cfgHH);
-    if (Number.isFinite(n) && n > 20) hourHeight = n;
+    const n = parseFloat(String(cfgHH).replace(/px$/i, "").trim());
+    if (Number.isFinite(n) && n >= 24 && n <= 240) hourHeight = n;
   }
   const cssHH = (getComputedStyle(this).getPropertyValue("--wpcp-timeline-hour-height") || "").trim();
   if (cssHH) {
     const n2 = parseFloat(cssHH);
-    if (Number.isFinite(n2) && n2 > 20) hourHeight = n2;
+    if (Number.isFinite(n2) && n2 >= 24 && n2 <= 240) hourHeight = n2;
   }
 } catch (e) {}
 const pxPerMin = hourHeight / 60;
@@ -2537,6 +2644,15 @@ const pxPerMin = hourHeight / 60;
     const windowStartMin = startH * 60;
     const windowEndMin = endH * 60;
 
+    const now = eh.DateTime.now();
+    const nowMin = now.hour * 60 + now.minute + now.second / 60;
+    const todayIndex = dayLayouts.findIndex((dl) => dl.day && dl.day.date && this._isToday(dl.day.date));
+    const showNowLine = !!this._showCurrentTimeBoundary && todayIndex >= 0 && nowMin > windowStartMin && nowMin < windowEndMin;
+    const nowTopPx = (nowMin - windowStartMin) * pxPerMin;
+    if (this._autoScroll) {
+      this._rnrTimelinePendingScrollTop = Math.max(0, (nowMin - windowStartMin) * pxPerMin - hourHeight);
+    }
+
     const style=W`<style>
       .timelineWrap{display:flex;flex-direction:column;gap:8px;width:100%;min-width:0;}
       .timelineHeader{display:grid;grid-template-columns:${labelW}px repeat(${dayCount},1fr);gap:8px;align-items:end;width:100%;min-width:0;}
@@ -2555,6 +2671,8 @@ const pxPerMin = hourHeight / 60;
       .timelineEvent .time{font-size:0.9em;opacity:0.9;}
       .timelineEvent .title{font-weight:600;white-space:normal;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;}
       .timelineEvent .loc{font-size:0.75em;opacity:.75;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-top:2px;}.timelineEvent .desc{font-size:0.78em;opacity:.85;white-space:normal;overflow:hidden;display:-webkit-box;-webkit-line-clamp:4;-webkit-box-orient:vertical;word-break:break-word;overflow-wrap:anywhere;margin-top:2px;}
+      .timelineEvent.timelineDimPast{opacity:.45;filter:grayscale(.25);}
+      .timelineNowLine{position:absolute;height:2px;background:#e53935;z-index:3;pointer-events:none;box-shadow:0 0 0 1px rgba(255,255,255,.35);}
 
     </style>`;
 
@@ -2596,6 +2714,8 @@ const pxPerMin = hourHeight / 60;
               </div>`;
             })}
 
+            ${showNowLine ? W`<div class="timelineNowLine" style="top:${nowTopPx}px; left:calc(${colWExpr(todayIndex)} + 6px); width:calc(${baseWExpr} - 12px);"></div>` : W``}
+
             ${dayLayouts.map((dl,dayIndex)=>{
               return dl.timed.map((it)=>{
                 const ev=it.e;
@@ -2604,6 +2724,8 @@ const pxPerMin = hourHeight / 60;
                 if (eMin <= windowStartMin || sMin >= windowEndMin) return W``;
                 const topPx = (sMin - windowStartMin)*pxPerMin;
                 const hPx = Math.max(18, (eMin - sMin)*pxPerMin);
+                const dimPast = this._rnrIsPastEventToday(ev, dl.day.date) ? " timelineDimPast" : "";
+                const evClass = ev.class ? ` ${ev.class}` : "";
 
                 const leftExpr = `calc(${colWExpr(dayIndex)} + (${it.col} * (${baseWExpr} / ${it.colCount})) + 6px)`;
                 const widthExpr = `calc((${baseWExpr} / ${it.colCount}) - 12px)`;
@@ -2611,7 +2733,7 @@ const pxPerMin = hourHeight / 60;
                 const timeLabel = `${fmtTime(ev.start)} - ${fmtTime(ev.end)}`;
                 const descRaw = (ev.description ?? ev.ce?.description ?? ev.extendedProps?.description ?? ev.ce?.extendedProps?.description ?? "").toString();
                 const desc = descRaw.trim();
-                return W`<div class="timelineEvent"
+                return W`<div class="timelineEvent${evClass}${dimPast}"
                   style="top:${topPx}px; height:${hPx}px; left:${leftExpr}; width:${widthExpr}; --border-color:${ev.colors?.[0]||'#999'}"
                   @click=${(e)=>{e.stopPropagation();this._handleEventClick(ev.ce||ev,e);}}>
                     <div class="title">${ev.summary||"(no title)"}</div>

@@ -1,6 +1,6 @@
 # Week Planner Card Plus
 
-**Current release: v2.0.12**
+**Current release: v2.0.16**
 
 **Week Planner Card Plus** is a fork of the excellent **Week Planner Card** by FamousWolf, with extra features aimed at a **Skylight-style family calendar dashboard**.  
 This “Plus” version adds UI behavior needed for our Skylight dashboard setup (for example: a working **Add button** + **hash-based popup routing** fixes), and it can be used with both **cloud calendars** (Google / CalDAV / etc.) and **Local Calendar (.ics)**.
@@ -30,8 +30,51 @@ For Local Calendar `.ics` add/edit/delete support, it’s designed to pair nicel
 - ✅ Local Calendar edits via Home Assistant’s native `calendar/event/update` WebSocket API
 - ✅ Optional **`soonTime`** window → CSS class `soon` for upcoming events
 - ✅ Schedule/timeline **`startHour` / `endHour`** (fixed or `auto`) to hide empty hours
+- ✅ Timeline **`autoScroll`**, **`dimPastEvents`**, **`showCurrentTimeBoundary`** (all opt-in, default off)
 - ✅ Optional pairing with **ICS Calendar Tools** as a fallback for Local Calendar `.ics`  
   https://github.com/randrcomputers/ics-calendar-tools
+
+---
+
+## Recent updates (October 2026)
+
+### v2.0.16 — Timeline hour row height ([#11](https://github.com/randrcomputers/week-planner-card-plus/issues/11))
+
+Optional **`timelineHourHeight`** (px) for schedule/timeline views. Default stays **`96`** (no change unless you set it). Use a smaller value (e.g. `56`–`72`) when hour rows feel too tall and you want more of the day on screen.
+
+```yaml
+viewMode: schedule   # or timelineDay / timelineWeek
+timelineHourHeight: 64
+```
+
+Aliases: `scheduleHourHeight`, `hourHeight`. CSS override: `--wpcp-timeline-hour-height: 64px`. Also available in the card editor.
+
+### v2.0.15 — Recurring edit timezone mismatch
+
+Fix Home Assistant `invalid_format` when editing a recurring Local Calendar occurrence: `dtstart`/`dtend` are now normalized to the same timezone (HA rejects mixed naive vs `+02:00` values).
+
+## Recent updates (September 2026)
+
+### v2.0.14 — Hide Edit when UPDATE_EVENT unsupported ([#10](https://github.com/randrcomputers/week-planner-card-plus/issues/10))
+
+Google calendars often report `supported_features: 3` (create + delete) but not `UPDATE_EVENT` (4). The event dialog no longer shows **Edit** in that case (Add/Delete still appear when those bits are set). Thanks [@tritanium73](https://github.com/tritanium73).
+
+### v2.0.13 — Timeline auto-scroll and “now” line ([#9](https://github.com/randrcomputers/week-planner-card-plus/issues/9))
+
+Thanks to [@sebeard](https://github.com/sebeard) for the suggestion. All three options default to **`false`** (no change unless you enable them):
+
+- **`autoScroll`** — on load, scroll the timeline so the current time is visible (~1 hour from the top)
+- **`dimPastEvents`** — dim timed events on **today** that already ended (timeline + list schedule view)
+- **`showCurrentTimeBoundary`** — red “now” line across **today’s column** in the timeline grid
+
+```yaml
+viewMode: schedule   # or timelineWeek / timelineDay
+autoScroll: true
+dimPastEvents: true
+showCurrentTimeBoundary: true
+startHour: auto      # pairs well with autoScroll (#5)
+endHour: auto
+```
 
 ---
 
@@ -123,6 +166,9 @@ If a gap is still reported, check whether **Hide days without events** is enable
 
 | Version | Notes |
 |---------|--------|
+| 2.0.15 | Recurring edit: normalize `dtstart`/`dtend` timezones for calendar WS update |
+| 2.0.14 | Hide **Edit** when calendar lacks `UPDATE_EVENT` (`supported_features` bit 4); also gate Add/Delete on CREATE/DELETE ([#10](https://github.com/randrcomputers/week-planner-card-plus/issues/10)) |
+| 2.0.13 | Timeline `autoScroll`, `dimPastEvents`, `showCurrentTimeBoundary` ([#9](https://github.com/randrcomputers/week-planner-card-plus/issues/9)) |
 | 2.0.12 | `soonTime` class; timeline `startHour`/`endHour`; document `combineSimilarEvents` |
 | 2.0.11 | Local Calendar native WS edit; series-safe recurring edit/delete ([PR #6](https://github.com/randrcomputers/week-planner-card-plus/pull/6) by [@enieuwy](https://github.com/enieuwy)) |
 | 2.0.10 | Title + Location native inputs; edit-dialog title fallback |
@@ -143,6 +189,8 @@ If a gap is still reported, check whether **Hide days without events** is enable
 - **[@pete-malibu](https://github.com/pete-malibu)** — [#7](https://github.com/randrcomputers/week-planner-card-plus/issues/7): `soonTime` / `soon` event class idea (v2.0.12)
 - **[@treiners](https://github.com/treiners)** — [#5](https://github.com/randrcomputers/week-planner-card-plus/issues/5): timeline `startHour` / `endHour` (v2.0.12)
 - **[@steelincable](https://github.com/steelincable)** — [#8](https://github.com/randrcomputers/week-planner-card-plus/issues/8): clarify `combineSimilarEvents` for multi-calendar lunch menus (v2.0.12)
+- **[@sebeard](https://github.com/sebeard)** — [#9](https://github.com/randrcomputers/week-planner-card-plus/issues/9): timeline auto-scroll, dim past events, now line (v2.0.13)
+- **[@tritanium73](https://github.com/tritanium73)** — [#10](https://github.com/randrcomputers/week-planner-card-plus/issues/10): hide Edit when `UPDATE_EVENT` unsupported (v2.0.14)
 
 ---
 
@@ -262,6 +310,7 @@ Week Planner Card Plus also includes a **Schedule** view intended to feel like a
 - All-day events are rendered as **pills** at the top of each day column.
 - Timed events render inside the hour grid.
 - Use **`startHour` / `endHour`** (or `"auto"`) to hide empty early/late hours — see Options below.
+- Enable **`autoScroll`**, **`dimPastEvents`**, and **`showCurrentTimeBoundary`** for a Google Calendar–style timeline (all default off).
 - If your dashboard uses narrow columns (or long descriptions), all-day pills may visually **bleed into the next day** unless wrapping is forced via CSS.
 
 ### Required card_mod for Schedule View
@@ -407,6 +456,35 @@ endHour: 22
 ```
 
 Aliases: `timelineStartHour` / `timelineEndHour`.
+
+### `timelineHourHeight` (number, px)
+
+Schedule/timeline view only. Height of each **hour row** in pixels.
+
+- Default: **`96`** (unchanged if omitted)
+- Typical denser values: `56`–`72`
+- Allowed range: `24`–`240`
+- Aliases: `scheduleHourHeight`, `hourHeight`
+- CSS: `--wpcp-timeline-hour-height: 64px`
+
+```yaml
+viewMode: timelineDay
+timelineHourHeight: 64
+startHour: 7
+endHour: 22
+```
+
+### `autoScroll` (boolean, timeline)
+
+When `true`, scrolls the timeline body on first load so the current time is visible (about one hour from the top). Default: **`false`**.
+
+### `dimPastEvents` (boolean, timeline + list schedule)
+
+When `true`, dims timed events on **today** that have already ended. Default: **`false`**.
+
+### `showCurrentTimeBoundary` (boolean, timeline)
+
+When `true`, shows a red horizontal line at the current time across **today’s column**. Default: **`false`**.
 
 ### `clickEmptyDayToAddPlus` (boolean)
 When `true`, empty-day / empty-space clicks open the **built-in Add dialog** (recommended).
