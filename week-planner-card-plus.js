@@ -2,7 +2,7 @@
    Prevents: Failed to execute 'define' ... name 'week-planner-card-plus' has already been used
    This can happen if the same JS is loaded twice (different URL, cache-busted params, or both YAML+UI resources).
 */
-console.info("[week-planner-card-plus] loaded patched build 2026-10-05 (v2.0.16 timelineHourHeight)");
+console.info("[week-planner-card-plus] loaded patched build 2026-10-15 (v2.0.17 write_calendar)");
 (()=>{try{
   const ce = globalThis.customElements;
   if(!ce||!ce.define||!ce.get) return;
@@ -991,7 +991,8 @@ async _rnrDoDelete(scope){
         // Prefer native Calendar WS delete (this is what the HA Calendar UI uses; required for Google recurring series)
         let wsDeleted = !1;
         try{
-            const ent = e._rnrClickedEntity || this._rnrLastClickedEntity || e.calendar || (e.calendars && e.calendars[0]) || null;
+            let ent = e._rnrClickedEntity || this._rnrLastClickedEntity || e.calendar || (e.calendars && e.calendars[0]) || null;
+            ent = this._rnrResolveWriteCalendar(ent) || ent;
             if(ent && uid && this.hass.connection && this.hass.connection.sendMessagePromise){
                 const payload = {type:"calendar/event/delete",entity_id:ent,uid:uid};
                 const rid = e.recurrence_id ?? e.recurrenceId ?? e.recurrenceID ?? null;
@@ -1029,7 +1030,8 @@ async _rnrDoDelete(scope){
         // IMPORTANT: Do NOT call any Home Assistant calendar.* delete services here.
         // Many installs do not expose them (you've seen "Action calendar.* not found").
         // We rely on ics_calendar_tools.delete_event, which is present and works for Local Calendar .ics.
-        for(const cal of cals){
+        for(const calRaw of cals){
+            const cal = this._rnrResolveWriteCalendar(calRaw) || calRaw;
             let did = false;
             try{
                 await this.hass.callService("ics_calendar_tools","delete_event",{
@@ -1134,8 +1136,30 @@ _rnrEventActionEntity(){
     const e=this._currentEventDetails||{};
     return e._rnrClickedEntity||this._rnrLastClickedEntity||e.calendar||e.entity||(e.calendars&&e.calendars[0])||null;
 }
+/** Map display/merge chip entity → write target (write_calendar). Default: same entity. */
+_rnrResolveWriteCalendar(entityId){
+    if(!entityId) return entityId;
+    try{
+        const list=this._calendars||[];
+        let cfg=list.find(c=>c && c.entity===entityId);
+        if(!cfg){
+            cfg=list.find(c=>{
+                if(!c) return !1;
+                const w=c.write_calendar||c.writeCalendar||c.write_entity||c.writeEntity;
+                return w===entityId;
+            });
+        }
+        if(!cfg) return entityId;
+        const w=cfg.write_calendar||cfg.writeCalendar||cfg.write_entity||cfg.writeEntity;
+        if(w!=null && String(w).trim()) return String(w).trim();
+        return cfg.entity||entityId;
+    }catch(_e){ return entityId; }
+}
 _rnrCalendarSupportedFeatures(entityId){
     try{
+        // Feature bits for add/edit/delete should follow the write calendar when set
+        // (merged/read-only display entities often have no CREATE/UPDATE bits).
+        entityId=this._rnrResolveWriteCalendar(entityId)||entityId;
         if(!entityId||!this.hass?.states) return null;
         const st=this.hass.states[entityId];
         if(!st) return null;
@@ -1155,7 +1179,7 @@ _rnrCalendarSupportsFeature(entityId, bit){
 _rnrAnyCalendarSupportsFeature(bit){
     const cals=this._calendars||[];
     if(!cals.length) return this._rnrCalendarSupportsFeature(null, bit);
-    return cals.some(c=>this._rnrCalendarSupportsFeature(c.entity, bit));
+    return cals.some(c=>this._rnrCalendarSupportsFeature(this._rnrResolveWriteCalendar(c.entity)||c.entity, bit));
 }
 
 // --- R&R patch: determine integration platform (google/local_calendar/caldav/etc) via entity registry ---
@@ -1640,18 +1664,20 @@ async _rnrSaveEdit(){
         const saveDesc=(d.description??"").toString().trim();
         if(!saveSummary&&saveDesc){saveSummary=saveDesc.split(/\r?\n/)[0].trim();d.summary=saveSummary;}
 
-        const cal = d.calendar || d.old_calendar || (d.calendars&&d.calendars.length?d.calendars[0]:null);
+        let cal = d.calendar || d.old_calendar || (d.calendars&&d.calendars.length?d.calendars[0]:null);
+        cal = this._rnrResolveWriteCalendar(cal) || cal;
         if(!cal){
             alert("No calendar target found for this event.");
             return;
         }
 
         // Build update payload (your backend expects these names)
+        const oldCal=this._rnrResolveWriteCalendar(d.old_calendar||cal)||cal;
         const payload={
             calendar:cal,
             uid:d.uid??null,
 
-            old_calendar:d.old_calendar||cal,
+            old_calendar:oldCal,
             old_uid:d.uid??null,
             old_summary:d.old_summary??null,
             old_start:d.old_start??null,
@@ -2186,6 +2212,7 @@ _closeDialog(){this._currentEventDetails=null,this._rnrEditOpen=!1,this._rnrEdit
                         ${this.getConfigValue("calendars").map((e,t)=>W`
                                 ${this.addExpansionPanel(`Calendar: ${e.name??e.entity}`,W`
                                         ${this.addEntityPickerField("calendars."+t+".entity","Entity",["calendar"])}
+                                        ${this.addEntityPickerField("calendars."+t+".write_calendar","Write calendar (optional — for merged/read-only chips)",["calendar"])}
                                         ${this.addTextField("calendars."+t+".name","Name")}
                                         ${this.addTextField("calendars."+t+".color","Color")}
                                         ${this.addIconPickerField("calendars."+t+".icon","Icon")}

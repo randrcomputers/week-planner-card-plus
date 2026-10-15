@@ -1,6 +1,6 @@
 # Week Planner Card Plus
 
-**Current release: v2.0.16**
+**Current release: v2.0.17**
 
 **Week Planner Card Plus** is a fork of the excellent **Week Planner Card** by FamousWolf, with extra features aimed at a **Skylight-style family calendar dashboard**.  
 This “Plus” version adds UI behavior needed for our Skylight dashboard setup (for example: a working **Add button** + **hash-based popup routing** fixes), and it can be used with both **cloud calendars** (Google / CalDAV / etc.) and **Local Calendar (.ics)**.
@@ -31,12 +31,29 @@ For Local Calendar `.ics` add/edit/delete support, it’s designed to pair nicel
 - ✅ Optional **`soonTime`** window → CSS class `soon` for upcoming events
 - ✅ Schedule/timeline **`startHour` / `endHour`** (fixed or `auto`) to hide empty hours
 - ✅ Timeline **`autoScroll`**, **`dimPastEvents`**, **`showCurrentTimeBoundary`** (all opt-in, default off)
+- ✅ Per-calendar **`write_calendar`** for merged/read-only chips (Add/Edit/Delete go to a writable calendar)
 - ✅ Optional pairing with **ICS Calendar Tools** as a fallback for Local Calendar `.ics`  
   https://github.com/randrcomputers/ics-calendar-tools
 
 ---
 
 ## Recent updates (October 2026)
+
+### v2.0.17 — Write calendar for merged chips ([#12](https://github.com/randrcomputers/week-planner-card-plus/issues/12))
+
+Optional per-calendar **`write_calendar`**: keep displaying a merged/read-only chip (`entity`) while Add / Edit / Delete target a writable calendar.
+
+```yaml
+calendars:
+  - entity: calendar.jane_merge      # ha-calendar-merge (or any display entity)
+    name: Jane
+    color: "#6D9DC5"
+    write_calendar: calendar.jane_personal_gmail
+```
+
+- Default: omitted → writes still go to `entity` (no change for existing cards)
+- Aliases: `writeCalendar`, `write_entity`, `writeEntity`
+- Edit/delete of events that are not on the write calendar may still fail (same caveat as in #12)
 
 ### v2.0.16 — Timeline hour row height ([#11](https://github.com/randrcomputers/week-planner-card-plus/issues/11))
 
@@ -380,6 +397,19 @@ For an **existing** recurring series, the pattern editor is disabled (delete + r
 ---
 
 ## Options
+
+### Per-calendar: `write_calendar` (entity id)
+
+Use when `entity` is a **merged / read-only** calendar (e.g. [ha-calendar-merge](https://github.com/superdingo101/ha-calendar-merge)) but Add/Edit/Delete should hit a real writable calendar.
+
+```yaml
+calendars:
+  - entity: calendar.jane_merge
+    name: Jane
+    write_calendar: calendar.jane_personal_gmail
+```
+
+Aliases: `writeCalendar`, `write_entity`, `writeEntity`. Default: unset (writes use `entity`).
 
 ### Per-calendar: `displayInHeader` (boolean)
 
