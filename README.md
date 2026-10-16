@@ -1,6 +1,6 @@
 # Week Planner Card Plus
 
-**Current release: v2.0.17**
+**Current release: v2.0.18**
 
 **Week Planner Card Plus** is a fork of the excellent **Week Planner Card** by FamousWolf, with extra features aimed at a **Skylight-style family calendar dashboard**.  
 This “Plus” version adds UI behavior needed for our Skylight dashboard setup (for example: a working **Add button** + **hash-based popup routing** fixes), and it can be used with both **cloud calendars** (Google / CalDAV / etc.) and **Local Calendar (.ics)**.
@@ -38,6 +38,10 @@ For Local Calendar `.ics` add/edit/delete support, it’s designed to pair nicel
 ---
 
 ## Recent updates (October 2026)
+
+### v2.0.18 — Schedule view showed “No events” ([#13](https://github.com/randrcomputers/week-planner-card-plus/issues/13))
+
+Bug fix: `viewMode: schedule` passed the day **date** into the event renderer instead of the day object, so events were loaded/assigned but never drawn (always “No events”). Grid / timeline / day-header pills were unaffected. Thanks [@xcuseulm](https://github.com/xcuseulm).
 
 ### v2.0.17 — Write calendar for merged chips ([#12](https://github.com/randrcomputers/week-planner-card-plus/issues/12))
 

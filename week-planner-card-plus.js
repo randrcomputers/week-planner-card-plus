@@ -2,7 +2,7 @@
    Prevents: Failed to execute 'define' ... name 'week-planner-card-plus' has already been used
    This can happen if the same JS is loaded twice (different URL, cache-busted params, or both YAML+UI resources).
 */
-console.info("[week-planner-card-plus] loaded patched build 2026-10-15 (v2.0.17 write_calendar)");
+console.info("[week-planner-card-plus] loaded patched build 2026-10-16 (v2.0.18 schedule render fix)");
 (()=>{try{
   const ce = globalThis.customElements;
   if(!ce||!ce.define||!ce.get) return;
@@ -2522,7 +2522,8 @@ _closeDialog(){this._currentEventDetails=null,this._rnrEditOpen=!1,this._rnrEdit
 
             <div class="events">
               ${(()=>{
-                const evs=this._rnrGetRenderableEventsForDay(d.date||d);
+                // Must pass the day object (has .events ids), not d.date (Luxon DateTime).
+                const evs=this._rnrGetRenderableEventsForDay(d);
                 if(!evs||evs.length===0) return this._renderNoEvents();
                 let rows=[...evs],limited=false;
                 if(this._maxDayEvents>0 && rows.length>this._maxDayEvents){ rows=rows.slice(0,this._maxDayEvents); limited=true; }
