@@ -53,6 +53,8 @@ For Local Calendar `.ics` add/edit/delete support, it’s designed to pair nicel
 - ✅ Optional pairing with **ICS Calendar Tools** as a fallback for Local Calendar `.ics`  
   https://github.com/randrcomputers/ics-calendar-tools
 
+---
+
 ### Compact event times
 
 Set `shortTime: true` to display event start and end times with a lowercase `a` or `p` suffix. Whole hours omit `:00` (for example, `8a` or `5p`); minutes remain when needed (for example, `12:30p` or `7:15p`). When omitted or `false`, event times continue to follow `timeFormat`.
