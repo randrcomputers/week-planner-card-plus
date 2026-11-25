@@ -279,6 +279,29 @@ function e(e){return e&&e.__esModule?e.default:e}let t=globalThis,n=t.ShadowRoot
         padding: var(--event-padding);
     }
 
+    .container .day .events .event .inner.time-inline {
+        display: grid;
+        grid-template-columns: auto minmax(0, 1fr);
+        column-gap: 6px;
+        align-content: start;
+        align-items: baseline;
+    }
+    .container .day .events .event .inner.time-inline > .time {
+        grid-column: 1;
+        grid-row: 1;
+        white-space: nowrap;
+        margin: 0;
+    }
+    .container .day .events .event .inner.time-inline > .title {
+        grid-column: 2;
+        grid-row: 1;
+        overflow-wrap: anywhere;
+    }
+    .container .day .events .event .inner.time-inline > .description,
+    .container .day .events .event .inner.time-inline > .location {
+        grid-column: 1 / -1;
+    }
+
     .container .day .events .event .time {
         color: var(--secondary-text-color, #aaaaaa);
         margin: 0 0 3px 0;
@@ -810,11 +833,11 @@ customElements.define("week-planner-card-plus",class extends es{static styles=i8
                                     style="--event-additional-color: ${e}"
                                 ></div>
                             `))}
-                        <div class="inner">
+                        <div class="inner ${this._config?.eventTimeInline?"time-inline":""}">
                             <div class="time">
                                 ${e.fullDay?W`${this._language.fullDay}`:W`
                                         ${e.start.toFormat(this._timeFormat)}
-                                        ${e.end?" - "+e.end.toFormat(this._timeFormat):""}
+                                        ${e.end&&this._config?.showEndTime!==false?" - "+e.end.toFormat(this._timeFormat):""}
                                     `}
                             </div>
                             ${this._showTitle?W`
@@ -2250,6 +2273,8 @@ _closeDialog(){this._currentEventDetails=null,this._rnrEditOpen=!1,this._rnrEdit
                         ${this.addBooleanField("dimPastEvents","Timeline: dim today's past events")}
                         ${this.addBooleanField("showCurrentTimeBoundary","Timeline: show current-time line (today)")}
                         ${this.addBooleanField("showTitle","Show title in overview",!0)}
+                        ${this.addBooleanField("showEndTime","Grid: show event end times",!0)}
+                        ${this.addBooleanField("eventTimeInline","Grid: show time beside event title")}
                         ${this.addBooleanField("showDescription","Show description in overview")}
                         ${this.addBooleanField("showLocation","Show location in overview")}
                         ${this.addTextField("locationLink","Override location link base URL")}
