@@ -312,6 +312,112 @@ function e(e){return e&&e.__esModule?e.default:e}let t=globalThis,n=t.ShadowRoot
         --mdc-icon-size: var(--event-icon-size);
     }
 
+
+    /* Optional compact calendar grid; existing card styling stays the default. */
+    .container.calendar-grid {
+        display: grid;
+        grid-template-columns: repeat(7, minmax(0, 1fr));
+        gap: 0;
+    }
+    .container.calendar-grid > .header:not(.day) {
+        grid-column: 1 / -1;
+        margin-bottom: 12px;
+    }
+    .container.calendar-grid > .day {
+        box-sizing: border-box;
+        width: auto;
+        min-width: 0;
+        margin: 0;
+        padding: 5px;
+        min-height: 130px;
+        border-top: 1px solid var(--divider-color, #ddd);
+        border-inline-end: 1px solid var(--divider-color, #ddd);
+    }
+    .container.calendar-grid > .day.header {
+        display: block;
+        min-height: 0;
+        padding: 4px 5px 8px;
+        border: 0;
+    }
+    .container.calendar-grid .day .date {
+        display: flex;
+        flex-direction: column;
+        align-items: flex-end;
+        gap: 2px;
+        margin-bottom: 7px;
+    }
+    .container.calendar-grid .day .date .number {
+        font-size: var(--calendar-grid-date-size, 30px);
+        line-height: 1.15;
+        padding: 1px 5px;
+        border-radius: 6px;
+    }
+    .container.calendar-grid .day.today .date .number {
+        background: var(--primary-color);
+        color: var(--text-primary-color, white);
+    }
+    .container.calendar-grid .day .date .text {
+        font-size: 12px;
+        line-height: 1.3;
+        color: var(--secondary-text-color);
+    }
+    .container.calendar-grid .day.sunday,
+    .container.calendar-grid .day.saturday {
+        background: color-mix(in srgb, var(--primary-text-color) 3%, transparent);
+    }
+    .container.calendar-grid .day .events .event {
+        margin-bottom: 3px;
+        border-left-width: 3px;
+        border-radius: 3px;
+        font-size: 12px;
+        line-height: 1.4;
+        background: transparent;
+        min-width: 0;
+    }
+    .container.calendar-grid .day .events .event .inner {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) auto;
+        column-gap: 5px;
+        align-items: baseline;
+        padding: 1px 4px;
+        min-width: 0;
+    }
+    .container.calendar-grid .day .events .event .inner > .title {
+        grid-column: 1;
+        grid-row: 1;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        overflow-wrap: normal;
+    }
+    .container.calendar-grid .day .events .event .inner > .time {
+        grid-column: 2;
+        grid-row: 1;
+        white-space: nowrap;
+        margin: 0;
+        font-size: 10px;
+        color: var(--secondary-text-color);
+    }
+    .container.calendar-grid .day .events .event .inner > .description,
+    .container.calendar-grid .day .events .event .inner > .location {
+        grid-column: 1 / -1;
+    }
+    .container.calendar-grid .day .events .event.all-day {
+        background: color-mix(in srgb, var(--border-color, #888) 18%, transparent);
+    }
+    .container.calendar-grid .day .events .event.all-day .inner {
+        grid-template-columns: minmax(0, 1fr);
+    }
+    .container.calendar-grid .day .events .event.all-day .time,
+    .container.calendar-grid .day .events .none {
+        display: none;
+    }
+    .container.calendar-grid .day .events .more {
+        font-size: 11px;
+        padding: 1px 4px;
+        color: var(--secondary-text-color);
+    }
+
     .loader {
         position: absolute;
         top: 16px;
@@ -734,7 +840,7 @@ customElements.define("week-planner-card-plus",class extends es{static styles=i8
                 <div class="card-content">
                     ${this._error?W`<div class="errors"><ha-alert alert-type="error">${this._error}</ha-alert></div>`:""}
                     ${this._title?W`<h1 class="card-title">${this._title}</h1>`:""}
-                    <div class="container${this._actions?" hasActions":""}" @click="${this._handleContainerClick}">
+                    <div class="container${this._config?.calendarGridStyle?" calendar-grid":""}${this._actions?" hasActions":""}" @click="${this._handleContainerClick}">
                         ${this._renderHeader()}
                         ${this._renderWeekDays()}
                         ${this._renderDays()}
@@ -815,7 +921,7 @@ customElements.define("week-planner-card-plus",class extends es{static styles=i8
         `:W``}_renderEvents(e){let t=[];if(e.events.map(e=>{if(!this._calendarEvents[e])return;let n=Object.assign({},this._calendarEvents[e]);if(this._rnrHideAllDayFromEventList(n))return;let i=[...n.calendars],r=[...n.colors],a=0;for(;a<i.length;)this._hideCalendars.indexOf(i[a])>-1?(i.splice(a,1),r.splice(a,1)):a++;0!==i.length&&(n.calendars=i,n.colors=r,t.push(n))}),0===t.length)return this._renderNoEvents();let n=!1;return this._maxDayEvents>0&&t.length>this._maxDayEvents&&(t.splice(this._maxDayEvents),n=!0),W`
             ${t.map(e=>{let t=[e.colors[0]];return W`
                     <div
-                        class="event ${e.class}"
+                        class="event ${e.class}${e.fullDay?" all-day":""}"
                         data-entity="${e.calendars[0]}"
                         data-additional-entities="${e.calendars.join(",")}"
                         data-summary="${e.summary}"
@@ -837,7 +943,7 @@ customElements.define("week-planner-card-plus",class extends es{static styles=i8
                             <div class="time">
                                 ${e.fullDay?W`${this._language.fullDay}`:W`
                                         ${e.start.toFormat(this._timeFormat)}
-                                        ${e.end&&this._config?.showEndTime!==false?" - "+e.end.toFormat(this._timeFormat):""}
+                                        ${e.end&&this._config?.showEndTime!==false&&!this._config?.calendarGridStyle?" - "+e.end.toFormat(this._timeFormat):""}
                                     `}
                             </div>
                             ${this._showTitle?W`
@@ -2275,6 +2381,7 @@ _closeDialog(){this._currentEventDetails=null,this._rnrEditOpen=!1,this._rnrEdit
                         ${this.addBooleanField("showTitle","Show title in overview",!0)}
                         ${this.addBooleanField("showEndTime","Grid: show event end times",!0)}
                         ${this.addBooleanField("eventTimeInline","Grid: show time beside event title")}
+                        ${this.addBooleanField("calendarGridStyle","Grid: compact calendar layout")}
                         ${this.addBooleanField("showDescription","Show description in overview")}
                         ${this.addBooleanField("showLocation","Show location in overview")}
                         ${this.addTextField("locationLink","Override location link base URL")}
