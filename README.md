@@ -1,5 +1,22 @@
 # Week Planner Card Plus
 
+## Fork: switch-label compatibility fix
+
+This fork fixes missing visual-editor switch labels on Home Assistant 2026.11+, which removed `ha-formfield`. Labels now use the `ha-switch` default slot, as recommended by Home Assistant. The Add/Edit dialog's **All day** switch is fixed too. Configuration keys, defaults and change handlers are unchanged. This patch targets the new switch component; older Home Assistant frontends are not verified.
+
+### Install this fix
+
+The fix is on branch `fix/visual-editor-switch-labels`. Until merged, download [week-planner-card-plus.js from that branch](https://github.com/dellop/week-planner-card-plus/blob/fix/visual-editor-switch-labels/week-planner-card-plus.js) using **Download raw file**. Copy it to `/config/www/week-planner-card-plus.js`, then use **Settings → Dashboards → Resources** to set its resource URL to `/local/week-planner-card-plus.js?v=label-fix-1`, type **JavaScript Module**. Replace the existing resource entry so only one copy of this card loads. Keep the existing YAML `type: custom:week-planner-card-plus`.
+
+After merging into this fork's `main`, HACS users can add `https://github.com/dellop/week-planner-card-plus` as a **Dashboard** custom repository and download **main** (under **Need a different version?**), rather than an older upstream release. If switching from the upstream HACS repository, back up your card YAML and remove the upstream download before installing the fork because both use the same filename and custom-element names. The HACS resource is `/hacsfiles/week-planner-card-plus/week-planner-card-plus.js`.
+
+Hard-refresh each browser (Ctrl+F5) or clear the companion app frontend cache, then reopen the visual editor. Check that switch labels appear, clicking a label toggles its switch, saved settings survive reopening, and **All day** still changes event dates correctly.
+
+Validation: JavaScript syntax check and extracted editor-template checks for translated labels, true/false checked states, and the original change handler. No live Home Assistant browser test was available.
+
+Compatibility reference: [Home Assistant 2026.11 frontend migration notes](https://contributors.home-assistant.io/blog/2026/10/28/frontend-component-updates-2026.11/).
+
+
 **Current release: v2.0.18**
 
 **Week Planner Card Plus** is a fork of the excellent **Week Planner Card** by FamousWolf, with extra features aimed at a **Skylight-style family calendar dashboard**.  
