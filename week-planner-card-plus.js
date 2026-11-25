@@ -2338,17 +2338,11 @@ _closeDialog(){this._currentEventDetails=null,this._rnrEditOpen=!1,this._rnrEdit
             <ha-select
                 name="${e}"
                 label="${window.__wpc_i18n_t(this,(t??e))}"
-                value="${this.getConfigValue(e,r)}"
+                .value="${this.getConfigValue(e,r)}"
+                .options="${n}"
                 .clearable="${i}"
-                @change="${this._valueChanged}"
-                @closed="${e=>{e.stopPropagation()}}"
-            >
-                ${n.map(e=>W`
-                        <mwc-list-item
-                            value="${e.value}"
-                        >${e.label??e.value}</mwc-list-item>
-                    `)}
-            </ha-select>
+                @selected="${event=>this.setConfigValue(e,event.detail.value??"")}"
+            ></ha-select>
         `}addBooleanField(e,t,n){return W`
                 <ha-switch
                     name="${e}"
